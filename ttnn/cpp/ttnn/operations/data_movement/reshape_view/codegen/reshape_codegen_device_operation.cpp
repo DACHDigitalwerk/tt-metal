@@ -78,9 +78,9 @@ void ReshapeCodegenDeviceOperation::validate_on_program_cache_miss(
     // A view keeps its source's buffer, so the buffer may hold more pages than the plan reads; interleaved
     // page i sits at the same address either way, so only a short buffer is an error.
     TT_FATAL(
-        input.buffer()->num_pages() >= layout.num_input_pages,
+        input.mesh_buffer().num_pages() >= layout.num_input_pages,
         "Reshape input has {} tiles, the tile-row plan needs at least {}",
-        input.buffer()->num_pages(),
+        input.mesh_buffer().num_pages(),
         layout.num_input_pages);
 }
 

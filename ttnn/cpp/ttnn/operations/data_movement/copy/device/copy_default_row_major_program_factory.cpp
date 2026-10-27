@@ -231,7 +231,7 @@ ttnn::device_operation::ProgramArtifacts CopyDeviceOperation::DefaultRowMajor::c
         tt::tt_metal::split_work_to_cores(compute_with_storage_grid_size, total_logical_rows);
     std::vector<CoreCoord> ordered_cores = corerange_to_cores(all_cores, num_cores, true);
 
-    std::uint32_t input_page_size = input.buffer()->page_size();
+    std::uint32_t input_page_size = input.mesh_buffer().page_size();
     // Since we are double buffering, the output page_size must be aligned so
     // the noc_write reads from an aligned address in the DFB
     std::uint32_t aligned_output_page_size = output.mesh_buffer().aligned_page_size();

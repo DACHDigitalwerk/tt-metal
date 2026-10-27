@@ -886,7 +886,7 @@ tt::tt_metal::ProgramDescriptor GroupNormDeviceOperation::GroupNormShardedProgra
     constexpr uint32_t in0_cb_index = tt::CBIndex::c_0;
     constexpr uint32_t in0_welford_alias_index = tt::CBIndex::c_29;
     constexpr uint32_t output_cb_index = tt::CBIndex::c_16;
-    uint32_t in0_cb_page_size = reader_repack_output ? a.buffer()->page_size() : in_single_tile_size;
+    uint32_t in0_cb_page_size = reader_repack_output ? a.mesh_buffer().page_size() : in_single_tile_size;
     if (inplace) {
         // input and output share the same CB and globally allocated buffer
         CBDescriptor in0_desc{
@@ -934,7 +934,7 @@ tt::tt_metal::ProgramDescriptor GroupNormDeviceOperation::GroupNormShardedProgra
         desc.cbs.push_back(std::move(in0_desc));
 
         uint32_t out_cb_total_size = reader_repack_output ? output.mesh_buffer().aligned_size_per_bank() : out_CB_size;
-        uint32_t out_cb_page_size = reader_repack_output ? output.buffer()->page_size() : out_single_tile_size;
+        uint32_t out_cb_page_size = reader_repack_output ? output.mesh_buffer().page_size() : out_single_tile_size;
         desc.cbs.push_back(CBDescriptor{
             .total_size = out_cb_total_size,
             .core_ranges = all_cores,

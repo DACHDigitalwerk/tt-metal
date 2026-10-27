@@ -174,9 +174,9 @@ void validate_allocations(
         output.mesh_buffer().aligned_page_size(),
         token_size_bytes(tensor_args));
     TT_FATAL(
-        output.buffer()->num_pages() >= args.seq_len_per_chip * args.num_experts_per_tok,
+        output.mesh_buffer().num_pages() >= args.seq_len_per_chip * args.num_experts_per_tok,
         "combine_fabric2d: output holds {} pages but seq_len_per_chip x num_experts_per_tok = {} are needed",
-        output.buffer()->num_pages(),
+        output.mesh_buffer().num_pages(),
         args.seq_len_per_chip * args.num_experts_per_tok);
 }
 

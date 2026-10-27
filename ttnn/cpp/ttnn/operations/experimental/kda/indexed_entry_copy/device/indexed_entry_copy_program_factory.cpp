@@ -56,7 +56,7 @@ ttnn::device_operation::ProgramArtifacts IndexedEntryCopyProgramFactory::create_
         params.index_offset < num_entries ? 1 + (num_entries - params.index_offset - 1) / params.index_scale : 0;
 
     // Validation equates page sizes and both sides are DRAM, so their aligned page sizes match.
-    const uint32_t page_size = source.buffer()->page_size();
+    const uint32_t page_size = source.mesh_buffer().page_size();
     const uint32_t page_stride = source.mesh_buffer().aligned_page_size();
 
     const auto grid = source.device()->compute_with_storage_grid_size();

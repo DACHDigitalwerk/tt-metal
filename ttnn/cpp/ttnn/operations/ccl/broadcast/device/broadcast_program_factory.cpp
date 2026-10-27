@@ -129,7 +129,7 @@ tt::tt_metal::ProgramDescriptor build_broadcast_descriptor_at(
     });
 
     // Tensor Info
-    const auto input_tensor_num_pages = input_tensor.buffer()->num_pages();
+    const auto input_tensor_num_pages = input_tensor.mesh_buffer().num_pages();
     bool is_sender = coord == operation_attributes.sender_coord;
 
     // KERNEL CREATION

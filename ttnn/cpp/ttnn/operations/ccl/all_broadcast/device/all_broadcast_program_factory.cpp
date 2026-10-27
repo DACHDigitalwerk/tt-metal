@@ -130,7 +130,7 @@ tt::tt_metal::ProgramDescriptor build_program_descriptor_at(
     });
 
     // Tensor Info
-    const auto input_tensor_num_pages = input_tensor.buffer()->num_pages();
+    const auto input_tensor_num_pages = input_tensor.mesh_buffer().num_pages();
 
     // KERNEL CREATION
     // Reader

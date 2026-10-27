@@ -40,7 +40,7 @@ ttnn::device_operation::ProgramArtifacts EmbeddingsRMProgramFactory::create_prog
     //                      Application Setup
     ////////////////////////////////////////////////////////////////////////////
 
-    bool output_sharded = is_sharded(output.buffer()->buffer_layout());
+    bool output_sharded = is_sharded(output.mesh_buffer().device_local_config().sharding_args.buffer_layout());
 
     uint32_t input_element_size_bytes = a.element_size();
     uint32_t weights_element_size_bytes = weights.element_size();

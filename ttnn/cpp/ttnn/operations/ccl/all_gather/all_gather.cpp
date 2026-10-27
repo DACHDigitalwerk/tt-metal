@@ -68,7 +68,7 @@ std::pair<bool, std::string> use_composite_all_gather(
     // Page sizes are UNALIGNED (content) sizes, so a matched-but-padded gather reads as matched, not
     // concat. The page checks below are no-ops for tile, whose pages are always aligned and equally
     // sized on both sides.
-    const uint32_t input_page_size = input_tensor.buffer()->page_size();
+    const uint32_t input_page_size = input_tensor.mesh_buffer().page_size();
     const uint32_t input_aligned_page_size = input_tensor.mesh_buffer().aligned_page_size();
     const uint32_t output_page_size = output_spec.compute_page_size_bytes();
 

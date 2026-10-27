@@ -17,7 +17,7 @@ namespace ttnn::experimental::prim {
 void LlamaAllGatherMatmulAsyncDeviceOperation::validate_on_program_cache_miss(
     const operation_attributes_t& args, const tensor_args_t& tensor_args) {
     const auto& input0 = tensor_args.input0;
-    const auto& page_size = input0.buffer()->page_size();
+    const auto& page_size = input0.mesh_buffer().page_size();
 
     TT_FATAL(
         page_size % input0.mesh_buffer().alignment() == 0, "All Gather Replicate currently requires aligned pages");

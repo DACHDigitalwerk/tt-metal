@@ -271,7 +271,7 @@ StridedAllGatherAsyncProgramFactory::strided_all_gather_async_minimal_default_he
     const CoreCoord core_grid_offset,
     const MMSignalAggregatorMode mm_signal_aggregator_mode) {
     // Tensor Info
-    const auto input_tensor_num_pages = input_tensor.buffer()->num_pages();
+    const auto input_tensor_num_pages = input_tensor.mesh_buffer().num_pages();
     const auto& input_tensor_shape = input_tensor.padded_shape();
     const auto& output_tensor_shape = output_tensor.padded_shape();
     auto* mesh_device = input_tensor.device();
@@ -282,7 +282,7 @@ StridedAllGatherAsyncProgramFactory::strided_all_gather_async_minimal_default_he
     uint32_t num_mux_cores_per_direction_per_link = 1;
     // Get worker cores
     // 2 senders (reader + writer) per direction (forward, reverse_order) per link
-    uint32_t output_data_size_bytes = output_tensor.buffer()->size();
+    uint32_t output_data_size_bytes = output_tensor.mesh_buffer().device_local_size();
     uint32_t num_workers_per_direction = num_workers_per_direction_opt.value_or(detail::strided_default_workers(
         *mesh_device,
         topology,
@@ -358,7 +358,7 @@ StridedAllGatherAsyncProgramFactory::strided_all_gather_async_minimal_default_he
     }
 
     // Get OP Config, topology config
-    uint32_t page_size = input_tensor.buffer()->page_size();
+    uint32_t page_size = input_tensor.mesh_buffer().page_size();
     auto [num_targets_forward, num_targets_backward] =
         ttnn::ccl::get_forward_backward_line_mcast_distance(ring_size, ring_index, topology, false);
     auto [unicast_forward_args, unicast_backward_args] = ttnn::ccl::get_forward_backward_line_unicast_configuration(

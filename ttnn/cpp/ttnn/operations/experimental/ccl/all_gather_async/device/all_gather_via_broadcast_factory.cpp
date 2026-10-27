@@ -101,7 +101,7 @@ tt::tt_metal::ProgramDescriptor build_descriptor_at(
 
     // Per-device page counts are defined by the local shard buffer, not by raw logical dims.
     // Converting pages via logical_shape() breaks tiled tensors and can zero out num_input_pages.
-    const uint32_t num_input_pages = input_tensor.buffer()->num_pages();
+    const uint32_t num_input_pages = input_tensor.mesh_buffer().num_pages();
     TT_FATAL(num_input_pages > 0, "Broadcast all-gather requires at least one input page");
     TT_FATAL(
         (num_input_pages * input_page_size) % output_page_size == 0,

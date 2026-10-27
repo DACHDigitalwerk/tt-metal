@@ -561,7 +561,7 @@ ChipShardPageGeometry derive_shard_page_geometry(
     for (int32_t i = dim; i < tensor_rank; ++i) {
         geometry.pages_per_outer_slice *= length_in_pages(i);
     }
-    const uint32_t num_pages = input.buffer()->num_pages();
+    const uint32_t num_pages = input.mesh_buffer().num_pages();
     geometry.pages_per_cache_slot = selected_batch ? num_pages / shape[0] : num_pages;
     TT_FATAL(
         geometry.num_outer_slices * geometry.pages_per_outer_slice == geometry.pages_per_cache_slot,

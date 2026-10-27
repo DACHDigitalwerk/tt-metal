@@ -33,7 +33,7 @@ uint32_t compute_geometry(
         // Use the buffer's physical page size so TensorAccessor gets the correct page size for
         // all layouts (interleaved, HEIGHT/WIDTH/BLOCK sharded). For HEIGHT_SHARDED this equals
         // last_dim * elem_size; for WIDTH/BLOCK_SHARDED it equals shard_width * elem_size.
-        const uint32_t phys_page_bytes = input.buffer()->page_size();
+        const uint32_t phys_page_bytes = input.mesh_buffer().page_size();
         const uint32_t elements_per_page = phys_page_bytes / input.element_size();
         // Use the buffer's allocator-aligned page size for the NOC transfer and interleaved
         // TensorAccessor stride, matching the buffer's actual per-page footprint in DRAM/L1.

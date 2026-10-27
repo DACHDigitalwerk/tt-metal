@@ -103,11 +103,11 @@ ReduceScatterDirectGeometry reduce_scatter_direct_geometry(
         inner_pages *= dim_pages(d);
     }
 
-    const uint32_t num_input_pages = input_tensor.buffer()->num_pages();
+    const uint32_t num_input_pages = input_tensor.mesh_buffer().num_pages();
     TT_FATAL(
         num_input_pages % num_devices == 0, "input pages {} must divide num_devices {}", num_input_pages, num_devices);
 
-    const uint32_t single_tile_bytes = input_tensor.buffer()->page_size();
+    const uint32_t single_tile_bytes = input_tensor.mesh_buffer().page_size();
     const uint32_t interm_tiles_per_packet =
         static_cast<uint32_t>(tt::tt_fabric::get_tt_fabric_channel_buffer_size_bytes(*input_tensor.device())) /
         single_tile_bytes;

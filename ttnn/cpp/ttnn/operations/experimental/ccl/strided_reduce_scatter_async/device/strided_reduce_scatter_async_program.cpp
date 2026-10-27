@@ -253,7 +253,7 @@ StridedReduceScatterProgramArtifacts build_ring_strided_reduce_scatter_async_pro
     // op hyperparams
     uint32_t num_directions_per_link = 2;
     uint32_t num_mux_cores_per_direction_per_link = 1;
-    uint64_t input_data_size_bytes = input_tensor.buffer()->size();
+    uint64_t input_data_size_bytes = input_tensor.mesh_buffer().device_local_size();
     uint32_t num_workers_per_direction =
         num_workers_per_direction_opt.value_or(ttnn::experimental::ccl::reduce_scatter_default_workers(
             *mesh_device,
@@ -272,7 +272,7 @@ StridedReduceScatterProgramArtifacts build_ring_strided_reduce_scatter_async_pro
         num_workers_per_direction, num_directions_per_link, num_mux_cores_per_direction_per_link);
 
     // Get OP Config, topology config
-    uint32_t page_size = static_cast<uint32_t>(input_tensor.buffer()->page_size());
+    uint32_t page_size = static_cast<uint32_t>(input_tensor.mesh_buffer().page_size());
     auto [unicast_forward_args, unicast_backward_args] = ccl::get_forward_backward_line_unicast_configuration(
         sender_device_coord, forward_coord, backward_coord, mesh_device);
     auto [mcast_forward_args, mcast_backward_args] = ccl::get_forward_backward_line_mcast_configuration(
@@ -367,7 +367,7 @@ StridedReduceScatterProgramArtifacts build_ring_strided_reduce_scatter_async_pro
     // when it only holds a window of it.
     const uint32_t input_tensor_num_pages = mm_logical_Ht.has_value()
                                                 ? input_tensor_B * input_tensor_C * input_tensor_Ht * input_tensor_Wt
-                                                : static_cast<uint32_t>(input_tensor.buffer()->num_pages());
+                                                : static_cast<uint32_t>(input_tensor.mesh_buffer().num_pages());
     const uint32_t output_tensor_num_pages = input_tensor_num_pages / ring_size;
     const uint32_t input_batch_num_pages = input_tensor_num_pages / input_tensor_B;
     const uint32_t output_batch_num_pages = output_tensor_num_pages / slice_B;

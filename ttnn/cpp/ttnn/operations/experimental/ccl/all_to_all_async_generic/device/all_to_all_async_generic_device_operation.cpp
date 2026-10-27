@@ -120,7 +120,7 @@ void AllToAllAsyncGenericDeviceOperation::validate_on_program_cache_miss(
         num_links,
         available_core_count);
 
-    const auto& page_size = input_tensor.buffer()->page_size();
+    const auto& page_size = input_tensor.mesh_buffer().page_size();
     const auto& input_shape = input_tensor.logical_shape();
     auto rank = input_shape.rank();
     const auto max_payload_size = tt::tt_fabric::get_tt_fabric_max_payload_size_bytes();
