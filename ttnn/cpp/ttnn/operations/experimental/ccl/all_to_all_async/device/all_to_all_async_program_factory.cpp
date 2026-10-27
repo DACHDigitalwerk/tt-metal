@@ -485,7 +485,7 @@ tt::tt_metal::ProgramDescriptor AllToAllAsyncProgram::create_descriptor(
         reader_rt_args.push_back(out_row_start);
         reader_rt_args.push_back(out_col_start);
         log_trace(tt::LogOp, "Reader Runtime Args:");
-        log_trace(tt::LogOp, "\t{}", tensor_args.input_tensor.buffer()->address());
+        log_trace(tt::LogOp, "\t{}", tensor_args.input_tensor.mesh_buffer().address());
         log_trace(tt::LogOp, "\t{}", in_row_tiles);
         log_trace(tt::LogOp, "\t{}", in_col_tiles);
         log_trace(tt::LogOp, "\t{}", input_row_device_stride);
@@ -518,8 +518,8 @@ tt::tt_metal::ProgramDescriptor AllToAllAsyncProgram::create_descriptor(
         };
 
         log_trace(tt::LogOp, "Writer Runtime Args:");
-        log_trace(tt::LogOp, "\t{}", tensor_args.persistent_intermediate_buffer.buffer()->address());
-        log_trace(tt::LogOp, "\t{}", tensor_args.persistent_output_buffer.buffer()->address());
+        log_trace(tt::LogOp, "\t{}", tensor_args.persistent_intermediate_buffer.mesh_buffer().address());
+        log_trace(tt::LogOp, "\t{}", tensor_args.persistent_output_buffer.mesh_buffer().address());
         for (size_t arg_idx = kSenderWriterSemaphoreAddr; arg_idx < writer_rt_args.size(); ++arg_idx) {
             log_trace(tt::LogOp, "\t{}", writer_rt_args[arg_idx]);
         }
@@ -613,9 +613,9 @@ void AllToAllAsyncProgram::override_runtime_arguments(
     (void)tensor_return_value;
     (void)coord;
 
-    const uint32_t input_addr = tensor_args.input_tensor.buffer()->address();
-    const uint32_t intermediate_addr = tensor_args.persistent_intermediate_buffer.buffer()->address();
-    const uint32_t output_addr = tensor_args.persistent_output_buffer.buffer()->address();
+    const uint32_t input_addr = tensor_args.input_tensor.mesh_buffer().address();
+    const uint32_t intermediate_addr = tensor_args.persistent_intermediate_buffer.mesh_buffer().address();
+    const uint32_t output_addr = tensor_args.persistent_output_buffer.mesh_buffer().address();
     const uint32_t semaphore_addr = static_cast<uint32_t>(operation_attributes.semaphore.address());
 
     auto& sender_reader_args_by_core = tt::tt_metal::GetRuntimeArgs(program, kWorkerSenderReaderKernelIdx);

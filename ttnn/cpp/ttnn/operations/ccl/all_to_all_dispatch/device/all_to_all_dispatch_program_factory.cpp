@@ -446,11 +446,11 @@ tt::tt_metal::ProgramDescriptor build_dispatch_program_descriptor(
         // 0..4 swapped to Buffer*'s for BufferBinding.  Semaphore addresses remain plain
         // uint32_t (stable across cache hits).
         std::vector<uint32_t> writer_runtime_args = {
-            input_tensor.buffer()->address(),     // placeholder
-            indices_tensor.buffer()->address(),   // placeholder
-            mapping_tensor.buffer()->address(),   // placeholder
-            output_tensor.buffer()->address(),    // placeholder
-            metadata_tensor.buffer()->address(),  // placeholder
+            input_tensor.mesh_buffer().address(),     // placeholder
+            indices_tensor.mesh_buffer().address(),   // placeholder
+            mapping_tensor.mesh_buffer().address(),   // placeholder
+            output_tensor.mesh_buffer().address(),    // placeholder
+            metadata_tensor.mesh_buffer().address(),  // placeholder
             (uint32_t)cross_device_semaphore.address(),
             (uint32_t)init_semaphore.address(),
             token_range_start,

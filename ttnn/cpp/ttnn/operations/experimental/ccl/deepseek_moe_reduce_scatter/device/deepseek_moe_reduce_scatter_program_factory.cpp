@@ -517,11 +517,11 @@ void DeepseekMoEReduceScatterMeshWorkloadFactory::override_runtime_arguments(
                     "deepseek_moe_reduce_scatter intermediate slice {} must have a buffer",
                     slice);
                 args[kWriterIntermediateArg0 + slice] =
-                    static_cast<uint32_t>(tensor_return_value.at(slice).buffer()->address());
+                    static_cast<uint32_t>(tensor_return_value.at(slice).mesh_buffer().address());
             }
             TT_FATAL(
                 tensor_return_value.back().is_allocated(), "deepseek_moe_reduce_scatter output must have a buffer");
-            args[kWriterOutputArg] = static_cast<uint32_t>(tensor_return_value.back().buffer()->address());
+            args[kWriterOutputArg] = static_cast<uint32_t>(tensor_return_value.back().mesh_buffer().address());
         }
     }
 }

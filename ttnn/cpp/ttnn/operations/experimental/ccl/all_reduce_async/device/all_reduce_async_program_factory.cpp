@@ -683,7 +683,7 @@ void AllReduceAsyncMeshWorkloadFactory::override_runtime_arguments(
     const std::optional<ttnn::MeshCoordinate>& coord) {
     (void)coord;
     tt::tt_metal::GetCommonRuntimeArgs(program, kWorkerReader)[ttnn::ccl::AllReduceReaderCommonArgs::input] =
-        tensor_args.input_tensor.buffer()->address();
+        tensor_args.input_tensor.mesh_buffer().address();
     tt::tt_metal::GetCommonRuntimeArgs(program, kWorkerWriter)[ttnn::ccl::AllReduceSemaphoreCommonArgs::semaphore] =
         static_cast<uint32_t>(operation_attributes.semaphore.address());
     tt::tt_metal::GetCommonRuntimeArgs(program, kReductionReader)[ttnn::ccl::AllReduceSemaphoreCommonArgs::semaphore] =

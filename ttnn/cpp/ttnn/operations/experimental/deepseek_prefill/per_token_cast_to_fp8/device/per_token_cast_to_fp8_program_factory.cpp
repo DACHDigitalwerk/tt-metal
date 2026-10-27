@@ -288,9 +288,9 @@ ttnn::device_operation::CachedProgram<PerTokenCastToFp8SharedVariables> create_p
         attrs.round_scale_to_power_of_two,
         defines);
 
-    const uint32_t src_addr = input.buffer()->address();
-    const uint32_t dst_e4m3_addr = output_e4m3.buffer()->address();
-    const uint32_t dst_scale_addr = output_scale.buffer()->address();
+    const uint32_t src_addr = input.mesh_buffer().address();
+    const uint32_t dst_e4m3_addr = output_e4m3.mesh_buffer().address();
+    const uint32_t dst_scale_addr = output_scale.mesh_buffer().address();
 
     auto all_cores_vec = corerange_to_cores(all_cores, num_cores, true);
     uint32_t offset = 0;  // ROW_MAJOR: first row; TILE: first 128-block. Advances by this core's unit count.
@@ -326,9 +326,9 @@ void apply_io_overrides(
     std::tuple<Tensor, Tensor>& tensor_return_value) {
     const auto& [output_e4m3, output_scale] = tensor_return_value;
     const auto& shared = cached_program.shared_variables;
-    const uint32_t src_addr = tensor_args.input_tensor.buffer()->address();
-    const uint32_t dst_e4m3_addr = output_e4m3.buffer()->address();
-    const uint32_t dst_scale_addr = output_scale.buffer()->address();
+    const uint32_t src_addr = tensor_args.input_tensor.mesh_buffer().address();
+    const uint32_t dst_e4m3_addr = output_e4m3.mesh_buffer().address();
+    const uint32_t dst_scale_addr = output_scale.mesh_buffer().address();
     for (const auto& core : shared.all_cores_vec) {
         auto& reader_args = tt::tt_metal::GetRuntimeArgs(cached_program.program, shared.reader_kernel_id, core);
         reader_args[0] = src_addr;

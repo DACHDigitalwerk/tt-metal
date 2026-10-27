@@ -44,7 +44,7 @@ inline Tensor move_impl(const Tensor& input_tensor, const std::optional<MemoryCo
         return input_tensor;
     }
 
-    auto input_address = ghost_input_tensor.buffer()->address();
+    auto input_address = ghost_input_tensor.mesh_buffer().address();
     tt::tt_metal::TensorSpec output_tensor_spec = ghost_input_tensor.tensor_spec();
     const auto& input_mem_config = ghost_input_tensor.memory_config();
 
@@ -66,7 +66,7 @@ inline Tensor move_impl(const Tensor& input_tensor, const std::optional<MemoryCo
 
     // A tensor moved within L1 it is meant to reallocate at higher addresses and a tensor moved within DRAM is meant to
     // reallocate at lower addresses If the tensor is not allocated in a new address, there is no need to move the data
-    if (move_within_same_mem_space and input_address == output_tensor.buffer()->address()) {
+    if (move_within_same_mem_space and input_address == output_tensor.mesh_buffer().address()) {
         log_debug(
             tt::LogOp,
             "WARNING: No space to move the tensor. Move op's input address and output address are equal: {}",
@@ -98,10 +98,10 @@ inline Tensor move_impl(const Tensor& input_tensor, const std::optional<MemoryCo
         switch (input_mem_config.buffer_type()) {
             // If DRAM, inverse logic because memory is allocated bottom up
             case tt::tt_metal::BufferType::DRAM: {
-                non_overlap = output_tensor.buffer()->address() + size_per_bank <= input_address;
+                non_overlap = output_tensor.mesh_buffer().address() + size_per_bank <= input_address;
             } break;
             case tt::tt_metal::BufferType::L1: {
-                non_overlap = input_address + size_per_bank <= output_tensor.buffer()->address();
+                non_overlap = input_address + size_per_bank <= output_tensor.mesh_buffer().address();
             } break;
             default: break;
         }
@@ -109,7 +109,7 @@ inline Tensor move_impl(const Tensor& input_tensor, const std::optional<MemoryCo
 
     bool fits_in_cb =
         (output_tensor.device()->allocator()->get_base_allocator_addr(HalMemType::L1) + size_per_l1_bank) <=
-        (output_mem_config.buffer_type() == tt::tt_metal::BufferType::L1 ? output_tensor.buffer()->address()
+        (output_mem_config.buffer_type() == tt::tt_metal::BufferType::L1 ? output_tensor.mesh_buffer().address()
                                                                          : output_tensor.device()->l1_size_per_core());
 
     ttnn::prim::qsr::MoveOpParallelizationStrategy move_op_parallelization_strategy =
@@ -140,7 +140,7 @@ inline Tensor move_sharded(const Tensor& input_tensor, const std::optional<Memor
         return {input_tensor};
     }
 
-    [[maybe_unused]] auto input_address = ghost_input_tensor.buffer()->address();
+    [[maybe_unused]] auto input_address = ghost_input_tensor.mesh_buffer().address();
     auto shard_spec = ghost_input_tensor.shard_spec().value();
 
     auto output_tensor_spec = ghost_input_tensor.tensor_spec();
@@ -157,7 +157,7 @@ inline Tensor move_sharded(const Tensor& input_tensor, const std::optional<Memor
     }
 
     auto output_tensor = create_device_tensor(output_tensor_spec, ghost_input_tensor.device());
-    if (ghost_input_tensor.buffer()->address() == output_tensor.buffer()->address()) {
+    if (ghost_input_tensor.mesh_buffer().address() == output_tensor.mesh_buffer().address()) {
         log_debug(
             tt::LogOp,
             "WARNING: No space to move the tensor. Move op's input address and output address are equal: {}",

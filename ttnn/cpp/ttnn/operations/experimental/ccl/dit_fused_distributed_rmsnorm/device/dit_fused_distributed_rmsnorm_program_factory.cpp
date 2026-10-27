@@ -1372,14 +1372,14 @@ for (uint32_t f = 0; f < num_forwarders; f++) {
     // ------------------------------------------------------------------------
     // Common runtime args
     // ------------------------------------------------------------------------
-    const uint32_t input_addr = input_tensor.buffer()->address();
-    const uint32_t output_addr = output_tensor.buffer()->address();
-    const uint32_t weight_addr = has_weight ? weight.value().buffer()->address() : 0;
-    const uint32_t bias_addr = has_bias ? bias.value().buffer()->address() : 0;
-    const uint32_t rope_cos_addr = fuse_rope ? rope_cos.value().buffer()->address() : 0;
-    const uint32_t rope_sin_addr = fuse_rope ? rope_sin.value().buffer()->address() : 0;
-    const uint32_t trans_mat_addr_rt = fuse_rope ? trans_mat.value().buffer()->address() : 0u;
-    const uint32_t recip_addr_rt = use_recip_lut ? reciprocals.value().buffer()->address() : 0u;
+    const uint32_t input_addr = input_tensor.mesh_buffer().address();
+    const uint32_t output_addr = output_tensor.mesh_buffer().address();
+    const uint32_t weight_addr = has_weight ? weight.value().mesh_buffer().address() : 0;
+    const uint32_t bias_addr = has_bias ? bias.value().mesh_buffer().address() : 0;
+    const uint32_t rope_cos_addr = fuse_rope ? rope_cos.value().mesh_buffer().address() : 0;
+    const uint32_t rope_sin_addr = fuse_rope ? rope_sin.value().mesh_buffer().address() : 0;
+    const uint32_t trans_mat_addr_rt = fuse_rope ? trans_mat.value().mesh_buffer().address() : 0u;
+    const uint32_t recip_addr_rt = use_recip_lut ? reciprocals.value().mesh_buffer().address() : 0u;
     const uint32_t stats_dram_addr = use_mux ? stats_dram_buffer->address() : 0u;
 
     uint32_t out_ready_sem_bank_addr = 0;
@@ -1409,7 +1409,7 @@ for (uint32_t f = 0; f < num_forwarders; f++) {
     std::vector<uint32_t> reader_common_args = {
         input_addr, weight_addr, bias_addr, rope_cos_addr, rope_sin_addr, recip_addr_rt};
     if (use_tile_row_map) {
-        reader_common_args.push_back(tile_row_map->buffer()->address());
+        reader_common_args.push_back(tile_row_map->mesh_buffer().address());
     }
     SetCommonRuntimeArgs(program, reader_kernel_id, reader_common_args);
     if (use_mux) {
@@ -1545,21 +1545,23 @@ void DitFusedDistributedRmsnormMeshWorkloadFactory::override_runtime_arguments(
     const DitFusedDistributedRmsnormParams& operation_attributes,
     const DitFusedDistributedRmsnormInputs& tensor_args,
     std::vector<Tensor>& tensor_return_value) {
-    const uint32_t input_addr = tensor_args.input.buffer()->address();
-    const uint32_t output_addr = tensor_return_value.at(0).buffer()->address();
-    const uint32_t weight_addr = tensor_args.weight.has_value() ? tensor_args.weight.value().buffer()->address() : 0;
-    const uint32_t bias_addr = tensor_args.bias.has_value() ? tensor_args.bias.value().buffer()->address() : 0;
+    const uint32_t input_addr = tensor_args.input.mesh_buffer().address();
+    const uint32_t output_addr = tensor_return_value.at(0).mesh_buffer().address();
+    const uint32_t weight_addr =
+        tensor_args.weight.has_value() ? tensor_args.weight.value().mesh_buffer().address() : 0;
+    const uint32_t bias_addr = tensor_args.bias.has_value() ? tensor_args.bias.value().mesh_buffer().address() : 0;
     const uint32_t trans_mat_addr =
-        tensor_args.transformation_mat.has_value() ? tensor_args.transformation_mat.value().buffer()->address() : 0;
+        tensor_args.transformation_mat.has_value() ? tensor_args.transformation_mat.value().mesh_buffer().address() : 0;
     const uint32_t rope_cos_addr =
-        tensor_args.rope_cos.has_value() ? tensor_args.rope_cos.value().buffer()->address() : 0;
+        tensor_args.rope_cos.has_value() ? tensor_args.rope_cos.value().mesh_buffer().address() : 0;
     const uint32_t rope_sin_addr =
-        tensor_args.rope_sin.has_value() ? tensor_args.rope_sin.value().buffer()->address() : 0;
+        tensor_args.rope_sin.has_value() ? tensor_args.rope_sin.value().mesh_buffer().address() : 0;
     // Stats DRAM scratch and the output are refreshed on each cache hit.
-    const uint32_t stats_dram_addr = tensor_return_value.size() > 1 ? tensor_return_value[1].buffer()->address() : 0u;
+    const uint32_t stats_dram_addr =
+        tensor_return_value.size() > 1 ? tensor_return_value[1].mesh_buffer().address() : 0u;
     // Recip LUT tensor is also a regular (caller-owned) device tensor; refresh its addr.
     const uint32_t recip_addr =
-        tensor_args.reciprocals.has_value() ? tensor_args.reciprocals.value().buffer()->address() : 0u;
+        tensor_args.reciprocals.has_value() ? tensor_args.reciprocals.value().mesh_buffer().address() : 0u;
     const auto& tile_row_map = tensor_args.affine_tile_row_map;
 
     const uint32_t out_ready_sem_addr = operation_attributes.multi_device_global_semaphore.empty()
@@ -1576,7 +1578,7 @@ void DitFusedDistributedRmsnormMeshWorkloadFactory::override_runtime_arguments(
         reader_common[4] = rope_sin_addr;
         reader_common[5] = recip_addr;
         if (tile_row_map.has_value()) {
-            reader_common[6] = tile_row_map->buffer()->address();
+            reader_common[6] = tile_row_map->mesh_buffer().address();
         }
 
         auto* writer_common = shared.writer_common_args->data();

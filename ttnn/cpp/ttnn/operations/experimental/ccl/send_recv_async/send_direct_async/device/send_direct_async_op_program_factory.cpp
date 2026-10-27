@@ -251,11 +251,11 @@ ProgramDescriptor SendDirectAsyncProgramFactory::create_descriptor(
         reader.runtime_args.emplace_back(
             sender_core_coord,
             KernelDescriptor::CoreRuntimeArgs{
-                input_tensor.buffer()->address(),  // smuggled-rta-ok: patched in override_runtime_arguments
-                pages_for_this_core,               // num_pages
-                page_start_offset,                 // page_start_offset
-                num_whole_packets,                 // num_whole_packets
-                num_pages_remainder,               // num_pages_remainder
+                input_tensor.mesh_buffer().address(),  // smuggled-rta-ok: patched in override_runtime_arguments
+                pages_for_this_core,                   // num_pages
+                page_start_offset,                     // page_start_offset
+                num_whole_packets,                     // num_whole_packets
+                num_pages_remainder,                   // num_pages_remainder
             });
 
         std::vector<uint32_t> writer_rt_args = {
@@ -305,7 +305,7 @@ void SendDirectAsyncProgramFactory::override_runtime_arguments(
     // Everything else in the runtime args (page counts, offsets, fabric connection trailers) derives
     // from the tensor spec and socket topology, both of which are in the program hash — so on a cache
     // hit only these two base addresses can have moved.
-    const uint32_t input_base_addr = input_tensor.buffer()->address();
+    const uint32_t input_base_addr = input_tensor.mesh_buffer().address();
     const uint32_t socket_config_addr = mesh_socket.get_config_buffer()->address();
 
     for (const auto& sender_core_coord :

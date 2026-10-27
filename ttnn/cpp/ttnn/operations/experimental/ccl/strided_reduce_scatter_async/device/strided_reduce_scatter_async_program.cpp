@@ -597,7 +597,7 @@ StridedReduceScatterProgramArtifacts build_ring_strided_reduce_scatter_async_pro
                 num_rs_readers,
                 credit_row_bytes);
             mm_fused_op_signaler->rs_credit_counters_buffer = credits.buffer();
-            rs_credit_counters_addr = static_cast<uint32_t>(credits.buffer()->address());
+            rs_credit_counters_addr = static_cast<uint32_t>(credits.mesh_buffer().address());
         } else {
             const auto credit_shard_spec = tt::tt_metal::ShardSpecBuffer(
                 mm_core_range_set,
@@ -1030,18 +1030,19 @@ void ring_strided_reduce_scatter_async_helper_override_runtime_arguments(
 
                 // sender reader
                 auto& worker_reader_sender_runtime_args = reader_runtime_args[core.x][core.y];
-                worker_reader_sender_runtime_args[0] = input.buffer()->address();
-                worker_reader_sender_runtime_args[1] = intermed.buffer()->address();
+                worker_reader_sender_runtime_args[0] = input.mesh_buffer().address();
+                worker_reader_sender_runtime_args[1] = intermed.mesh_buffer().address();
                 worker_reader_sender_runtime_args[2] = semaphore.at(dir).address();
                 if (reader_addcmul_rt_arg_offset > 0 && addcmul_a.has_value() && addcmul_b.has_value()) {
-                    worker_reader_sender_runtime_args[reader_addcmul_rt_arg_offset] = addcmul_a->buffer()->address();
+                    worker_reader_sender_runtime_args[reader_addcmul_rt_arg_offset] =
+                        addcmul_a->mesh_buffer().address();
                     worker_reader_sender_runtime_args[reader_addcmul_rt_arg_offset + 1] =
-                        addcmul_b->buffer()->address();
+                        addcmul_b->mesh_buffer().address();
                 }
                 // sender writer
                 auto& worker_writer_sender_runtime_args = writer_runtime_args[core.x][core.y];
-                worker_writer_sender_runtime_args[0] = intermed.buffer()->address();
-                worker_writer_sender_runtime_args[1] = output.buffer()->address();
+                worker_writer_sender_runtime_args[0] = intermed.mesh_buffer().address();
+                worker_writer_sender_runtime_args[1] = output.mesh_buffer().address();
                 worker_writer_sender_runtime_args[4] = semaphore.at(dir).address();
                 worker_writer_sender_runtime_args[5] = semaphore.at(num_directions_per_link).address();
 

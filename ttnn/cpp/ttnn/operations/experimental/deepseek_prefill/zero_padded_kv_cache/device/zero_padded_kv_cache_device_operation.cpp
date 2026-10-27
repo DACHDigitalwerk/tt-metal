@@ -305,9 +305,10 @@ tt::tt_metal::ProgramDescriptor ZeroPaddedKvCacheDeviceOperation::ProgramFactory
     auto* device = cache.device();
     const auto& cache_shape = cache.padded_shape();
     const bool has_metadata = tensor_args.slot_idx.has_value();
-    const uint32_t slot_idx_addr = has_metadata ? static_cast<uint32_t>(tensor_args.slot_idx->buffer()->address()) : 0u;
+    const uint32_t slot_idx_addr =
+        has_metadata ? static_cast<uint32_t>(tensor_args.slot_idx->mesh_buffer().address()) : 0u;
     const uint32_t valid_global_addr =
-        has_metadata ? static_cast<uint32_t>(tensor_args.valid_global->buffer()->address()) : 0u;
+        has_metadata ? static_cast<uint32_t>(tensor_args.valid_global->mesh_buffer().address()) : 0u;
 
     const tt::DataFormat cache_format = datatype_to_dataformat_converter(cache.dtype());
     const bool is_row_major = cache.layout() == Layout::ROW_MAJOR;
@@ -487,8 +488,8 @@ void ZeroPaddedKvCacheDeviceOperation::MeshWorkloadFactory::override_runtime_arg
     //   - scalar path: every kernel reads slot_idx (9)/valid_global (3). TILE has reader/compute/writer
     //     (3 kernels); ROW_MAJOR is a dataflow-only writer (1 kernel).
     if (tensor_args.slot_idx.has_value()) {
-        const uint32_t slot_idx_addr = static_cast<uint32_t>(tensor_args.slot_idx->buffer()->address());
-        const uint32_t valid_global_addr = static_cast<uint32_t>(tensor_args.valid_global->buffer()->address());
+        const uint32_t slot_idx_addr = static_cast<uint32_t>(tensor_args.slot_idx->mesh_buffer().address());
+        const uint32_t valid_global_addr = static_cast<uint32_t>(tensor_args.valid_global->mesh_buffer().address());
         for (auto& [coordinate_range, program] : cached_workload.workload.get_programs()) {
             for (uint32_t kernel_handle : {0u, 2u}) {  // reader, writer (metadata path is TILE-only)
                 auto& common = GetCommonRuntimeArgs(program, kernel_handle);

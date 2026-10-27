@@ -219,9 +219,9 @@ ProgramDescriptor AllReduceCreateQkvHeadsMeshWorkloadFactory::create_descriptor(
         }}},
     });
 
-    uint32_t q_base_addr = q_output_tensor.buffer()->address();
-    uint32_t k_base_addr = k_output_tensor.buffer()->address();
-    uint32_t v_base_addr = v_output_tensor.buffer()->address();
+    uint32_t q_base_addr = q_output_tensor.mesh_buffer().address();
+    uint32_t k_base_addr = k_output_tensor.mesh_buffer().address();
+    uint32_t v_base_addr = v_output_tensor.mesh_buffer().address();
 
     // cores for q
     const uint32_t q_num_cores = q_cores.num_cores();  // number of cores of the output
@@ -608,7 +608,7 @@ ProgramDescriptor AllReduceCreateQkvHeadsMeshWorkloadFactory::create_descriptor(
         q_base_addr,
         k_base_addr,
         v_base_addr,
-        batch_offset_tensor.buffer()->address(),
+        batch_offset_tensor.mesh_buffer().address(),
         0,
         output_tensor_shard_num_pages};
     reader_writer_runtime_args_template.insert(

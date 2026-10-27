@@ -940,7 +940,7 @@ void generate_multi_input_command_stream_kernel_rt_args(
 
     std::vector<uint32_t> rt_args;
     rt_args.reserve(200);
-    rt_args.push_back(tensor.buffer()->address());
+    rt_args.push_back(tensor.mesh_buffer().address());
     rt_args.push_back(ccl_command_stream.size());  // in0_read_command_slices
     const size_t command_stream_start_arg_index = rt_args.size();
     rt_args.push_back(0);  // in0_command_start_offset

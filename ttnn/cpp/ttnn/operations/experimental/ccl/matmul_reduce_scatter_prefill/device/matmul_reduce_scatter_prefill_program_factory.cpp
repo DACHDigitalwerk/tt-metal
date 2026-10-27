@@ -969,9 +969,9 @@ void MatmulReduceScatterPrefillMeshWorkloadFactory::override_runtime_arguments(
     // - the global semaphores and the mailbox: never. They are created once per mesh (ensure_mesh_resources) and live
     //   as long as the mesh and its program cache, so create_descriptor's values stay right.
     //   port_sender_rt::ARRIVAL_ADDR (per core) is the same kind of address.
-    const auto a_addr = static_cast<uint32_t>(tensor_args.input_tensor.buffer()->address());
-    const auto w_addr = static_cast<uint32_t>(tensor_args.weight.buffer()->address());
-    const auto out_addr = static_cast<uint32_t>(output.buffer()->address());
+    const auto a_addr = static_cast<uint32_t>(tensor_args.input_tensor.mesh_buffer().address());
+    const auto w_addr = static_cast<uint32_t>(tensor_args.weight.mesh_buffer().address());
+    const auto out_addr = static_cast<uint32_t>(output.mesh_buffer().address());
     const Buffer& staging = *tensor_args.staging.buffer();
     const auto staging_addr = static_cast<uint32_t>(staging.address());
     for (const auto& [range, sv] : cached.shared_variables) {  // a walk, no lookup per program

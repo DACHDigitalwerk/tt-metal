@@ -2753,10 +2753,10 @@ ReduceScatterProgramArtifacts::RuntimeArgs ReduceScatterProgramArtifacts::collec
     const std::optional<Tensor>& penult) {
     using Args = ttnn::ccl::ReduceScatterCommonArgs;
     RuntimeArgs args{};
-    args[Args::input] = input.buffer()->address();
-    args[Args::intermediate] = intermediate.buffer()->address();
-    args[Args::output] = output.buffer()->address();
-    args[Args::penult] = penult ? penult->buffer()->address() : 0;
+    args[Args::input] = input.mesh_buffer().address();
+    args[Args::intermediate] = intermediate.mesh_buffer().address();
+    args[Args::output] = output.mesh_buffer().address();
+    args[Args::penult] = penult ? penult->mesh_buffer().address() : 0;
     args[Args::barrier] = barrier ? barrier->address() : 0;
     args[Args::semaphore_0] = semaphores.at(0).address();
     args[Args::semaphore_1] = is_ring ? semaphores.at(1).address() : 0;

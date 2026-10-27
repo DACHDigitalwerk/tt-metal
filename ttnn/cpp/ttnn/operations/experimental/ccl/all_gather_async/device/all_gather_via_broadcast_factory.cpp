@@ -229,9 +229,9 @@ tt::tt_metal::ProgramDescriptor build_descriptor_at(
         // (semaphores live on workload_descriptor.semaphores), so they may
         // remain embedded plain uint32 values.
         std::vector<uint32_t> writer_rt_args = {
-            output_tensor.buffer()->address(),  // tensor_address0  (replaced with Buffer* below)
-            semaphore.address(),                // out_ready_sem_bank_addr (absolute address)
-            barrier_semaphore.address(),        // barrier_sem
+            output_tensor.mesh_buffer().address(),  // tensor_address0  (replaced with Buffer* below)
+            semaphore.address(),                    // out_ready_sem_bank_addr (absolute address)
+            barrier_semaphore.address(),            // barrier_sem
             output_tile_id_start,
             output_tile_id_end,
             wait_output_semaphore,     // wait_output_semaphore

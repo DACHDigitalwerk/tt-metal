@@ -72,20 +72,20 @@ void MinimalMatmulStridedReduceScatterAsyncProgramFactory::override_runtime_argu
     TT_FATAL(output_tensor[2].is_allocated(), "reduce-scatter output must have a buffer");
     TT_FATAL(tensor_args.input_tensor.is_allocated(), "matmul input must have a buffer");
     TT_FATAL(tensor_args.weight_tensor.is_allocated(), "matmul weight must have a buffer");
-    const uint32_t mm_output_addr = static_cast<uint32_t>(output_tensor[0].buffer()->address());
-    const uint32_t rs_intermediate_addr = static_cast<uint32_t>(output_tensor[1].buffer()->address());
-    const uint32_t rs_output_addr = static_cast<uint32_t>(output_tensor[2].buffer()->address());
-    const uint32_t input_addr = static_cast<uint32_t>(tensor_args.input_tensor.buffer()->address());
-    const uint32_t weight_addr = static_cast<uint32_t>(tensor_args.weight_tensor.buffer()->address());
+    const uint32_t mm_output_addr = static_cast<uint32_t>(output_tensor[0].mesh_buffer().address());
+    const uint32_t rs_intermediate_addr = static_cast<uint32_t>(output_tensor[1].mesh_buffer().address());
+    const uint32_t rs_output_addr = static_cast<uint32_t>(output_tensor[2].mesh_buffer().address());
+    const uint32_t input_addr = static_cast<uint32_t>(tensor_args.input_tensor.mesh_buffer().address());
+    const uint32_t weight_addr = static_cast<uint32_t>(tensor_args.weight_tensor.mesh_buffer().address());
     uint32_t bias_addr = 0;
     if (tensor_args.bias.has_value()) {
         TT_FATAL(tensor_args.bias->is_allocated(), "matmul bias must have a buffer");
-        bias_addr = static_cast<uint32_t>(tensor_args.bias->buffer()->address());
+        bias_addr = static_cast<uint32_t>(tensor_args.bias->mesh_buffer().address());
     }
     uint32_t optional_input_addr = 0;
     if (tensor_args.mm_optional_input_tensor.has_value()) {
         TT_FATAL(tensor_args.mm_optional_input_tensor->is_allocated(), "optional matmul input must have a buffer");
-        optional_input_addr = static_cast<uint32_t>(tensor_args.mm_optional_input_tensor->buffer()->address());
+        optional_input_addr = static_cast<uint32_t>(tensor_args.mm_optional_input_tensor->mesh_buffer().address());
     }
     const bool fuse_addcmul =
         tensor_args.addcmul_input_tensor1.has_value() && tensor_args.addcmul_input_tensor2.has_value();
@@ -94,8 +94,8 @@ void MinimalMatmulStridedReduceScatterAsyncProgramFactory::override_runtime_argu
     if (fuse_addcmul) {
         TT_FATAL(tensor_args.addcmul_input_tensor1->is_allocated(), "addcmul input A must have a buffer");
         TT_FATAL(tensor_args.addcmul_input_tensor2->is_allocated(), "addcmul input B must have a buffer");
-        addcmul_a_addr = static_cast<uint32_t>(tensor_args.addcmul_input_tensor1->buffer()->address());
-        addcmul_b_addr = static_cast<uint32_t>(tensor_args.addcmul_input_tensor2->buffer()->address());
+        addcmul_a_addr = static_cast<uint32_t>(tensor_args.addcmul_input_tensor1->mesh_buffer().address());
+        addcmul_b_addr = static_cast<uint32_t>(tensor_args.addcmul_input_tensor2->mesh_buffer().address());
     }
     const bool windowed = operation_attributes.mm_window_blocks.has_value();
     const bool caller_progress = tensor_args.mm_progress_counters.has_value();
@@ -103,12 +103,12 @@ void MinimalMatmulStridedReduceScatterAsyncProgramFactory::override_runtime_argu
     uint32_t progress_addr = 0;
     if (caller_progress) {
         TT_FATAL(tensor_args.mm_progress_counters->is_allocated(), "mm_progress_counters must have a buffer");
-        progress_addr = static_cast<uint32_t>(tensor_args.mm_progress_counters->buffer()->address());
+        progress_addr = static_cast<uint32_t>(tensor_args.mm_progress_counters->mesh_buffer().address());
     }
     uint32_t credit_addr = 0;
     if (caller_credit) {
         TT_FATAL(tensor_args.mm_credit_counters->is_allocated(), "mm_credit_counters must have a buffer");
-        credit_addr = static_cast<uint32_t>(tensor_args.mm_credit_counters->buffer()->address());
+        credit_addr = static_cast<uint32_t>(tensor_args.mm_credit_counters->mesh_buffer().address());
     }
     uint32_t reader_progress_arg = kReaderArgPrefix;
     if ((caller_progress || caller_credit) && output_tensor[1].is_sharded()) {

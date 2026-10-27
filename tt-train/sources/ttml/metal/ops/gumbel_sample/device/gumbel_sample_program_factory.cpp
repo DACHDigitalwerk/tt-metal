@@ -206,7 +206,7 @@ DerivedRuntimeArgs derive_runtime_args(const operation_attributes_t& args, const
     derived.inv_temperature_bits =
         uses_gumbel_noise(args.temperature) ? std::bit_cast<uint32_t>(1.0F / args.temperature) : 0U;
     // Zero when absent: the slot exists in both modes so the cache-hit patch is unconditional.
-    derived.positions_address = tensor_args.positions.has_value() ? tensor_args.positions->buffer()->address() : 0U;
+    derived.positions_address = tensor_args.positions.has_value() ? tensor_args.positions->mesh_buffer().address() : 0U;
     // 0 for a shared [1,1,1,V] mask, Wt for per-row [B,1,1,V]; one cached program serves both.
     derived.mask_entry_stride =
         (tensor_args.logits_mask.has_value() && tensor_args.logits_mask->logical_shape()[0] > 1U)
@@ -494,9 +494,9 @@ void GumbelSampleProgramFactory::override_runtime_arguments(
     const uint32_t Ht = logits.padded_shape()[-2] / tt::constants::TILE_HEIGHT;
     const uint32_t logical_tokens = logits.logical_shape()[-2];
 
-    const uint32_t logits_address = logits.buffer()->address();
-    const uint32_t mask_address = has_mask ? tensor_args.logits_mask->buffer()->address() : 0U;
-    const uint32_t output_address = tensor_return_value.buffer()->address();
+    const uint32_t logits_address = logits.mesh_buffer().address();
+    const uint32_t mask_address = has_mask ? tensor_args.logits_mask->mesh_buffer().address() : 0U;
+    const uint32_t output_address = tensor_return_value.mesh_buffer().address();
 
     // seed and temperature are runtime-only (excluded from the program hash so changing either
     // reuses the cached program) and must be re-applied on every hit, from the SAME derivation the

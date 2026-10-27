@@ -223,7 +223,7 @@ tt::tt_metal::ProgramDescriptor build_all_to_all_dispatch_metadata_program_descr
     log_debug(
         tt::LogOp,
         "Metadata tensor buffer address: {} size: {}",
-        metadata_tensor.buffer()->address(),
+        metadata_tensor.mesh_buffer().address(),
         metadata_tensor.mesh_buffer().device_local_size());
 
     // drain_sync_tilizer_core is resolved in the invoke function (all_to_all_dispatch_metadata.cpp)
@@ -665,7 +665,7 @@ tt::tt_metal::ProgramDescriptor build_all_to_all_dispatch_metadata_program_descr
     log_debug(
         tt::LogOp,
         "Address comparison - metadata_tensor: {} (size: {}), cross_device_semaphore: {}, init_semaphore: {}",
-        metadata_tensor.buffer()->address(),
+        metadata_tensor.mesh_buffer().address(),
         metadata_tensor.mesh_buffer().device_local_size(),
         cross_device_semaphore.address(),
         init_semaphore.has_value() ? init_semaphore->address() : 0);

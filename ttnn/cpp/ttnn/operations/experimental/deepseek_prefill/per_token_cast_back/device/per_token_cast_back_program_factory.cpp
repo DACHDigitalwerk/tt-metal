@@ -438,15 +438,15 @@ void PerTokenCastBackProgramFactory::override_runtime_arguments(
     auto& program = cached_program.program;
     auto& shared = cached_program.shared_variables;
 
-    uint32_t src_e4m3_addr = tensor_args.input_e4m3.buffer()->address();
-    uint32_t src_scale_addr = tensor_args.input_scale.buffer()->address();
-    uint32_t dst_addr = tensor_return_value.buffer()->address();
+    uint32_t src_e4m3_addr = tensor_args.input_e4m3.mesh_buffer().address();
+    uint32_t src_scale_addr = tensor_args.input_scale.mesh_buffer().address();
+    uint32_t dst_addr = tensor_return_value.mesh_buffer().address();
     const bool token_count_aware = operation_attributes.token_count_aware;
 
     if (token_count_aware) {
-        const uint32_t region_addr = tensor_args.expert_region_offsets->buffer()->address();
-        const uint32_t counts_addr = tensor_args.expert_token_counts->buffer()->address();
-        const uint32_t table_addr = tensor_args.global_expert_idx_table->buffer()->address();
+        const uint32_t region_addr = tensor_args.expert_region_offsets->mesh_buffer().address();
+        const uint32_t counts_addr = tensor_args.expert_token_counts->mesh_buffer().address();
+        const uint32_t table_addr = tensor_args.global_expert_idx_table->mesh_buffer().address();
         for (const auto& core : shared.all_cores_vec) {
             auto& reader_args = tt::tt_metal::GetRuntimeArgs(program, shared.reader_kernel_id, core);
             reader_args[0] = src_e4m3_addr;

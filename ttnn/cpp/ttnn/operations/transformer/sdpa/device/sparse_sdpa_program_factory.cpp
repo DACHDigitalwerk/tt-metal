@@ -376,18 +376,18 @@ void SparseSDPAOperation::SparseSDPAProgramFactory::override_runtime_arguments(
     // tensor-accessor metadata follows these slots and remains unchanged under the cache key.
     const auto& t = tensor_args;
     const uint32_t offset = operation_attributes.cache_batch_idx.value_or(0) * t.kv.logical_shape()[2];
-    const uint32_t kv = t.kv.buffer()->address();
+    const uint32_t kv = t.kv.mesh_buffer().address();
     auto& reader_args = tt::tt_metal::GetCommonRuntimeArgs(program, 0);
     auto& writer_args = tt::tt_metal::GetCommonRuntimeArgs(program, 1);
-    reader_args[::sparse_sdpa::reader_common_arg::Q_ADDRESS] = t.q.buffer()->address();
+    reader_args[::sparse_sdpa::reader_common_arg::Q_ADDRESS] = t.q.mesh_buffer().address();
     reader_args[::sparse_sdpa::reader_common_arg::KV_ADDRESS] = kv;
-    reader_args[::sparse_sdpa::reader_common_arg::INDICES_ADDRESS] = t.indices.buffer()->address();
+    reader_args[::sparse_sdpa::reader_common_arg::INDICES_ADDRESS] = t.indices.mesh_buffer().address();
     reader_args[::sparse_sdpa::reader_common_arg::KV_BATCH_PAGE_OFFSET] = offset;
-    writer_args[::sparse_sdpa::writer_common_arg::OUTPUT_ADDRESS] = tensor_return_value.buffer()->address();
+    writer_args[::sparse_sdpa::writer_common_arg::OUTPUT_ADDRESS] = tensor_return_value.mesh_buffer().address();
     writer_args[::sparse_sdpa::writer_common_arg::KV_ADDRESS] = kv;
     writer_args[::sparse_sdpa::writer_common_arg::KV_BATCH_PAGE_OFFSET] = offset;
     writer_args[::sparse_sdpa::writer_common_arg::ATTENTION_SINK_ADDRESS] =
-        t.attention_sink.has_value() ? t.attention_sink->buffer()->address() : 0u;
+        t.attention_sink.has_value() ? t.attention_sink->mesh_buffer().address() : 0u;
 }
 
 }  // namespace ttnn::prim
