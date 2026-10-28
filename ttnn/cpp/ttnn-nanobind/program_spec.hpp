@@ -29,4 +29,8 @@ void set_known_attribute(nb::handle self, const nb::str& name, nb::handle value,
 // before the C++ object refers to the new tensors: if it fails, the object is unchanged.
 void set_tensor_owners(nb::handle self, nb::handle owners);
 
+// The attribute in which a Python ProgramRunArgs holds its tensor_args dict. The C++ object refers to the tensors'
+// MeshTensors, so the dict keeps them alive.
+inline constexpr const char* TENSOR_ARGS_ATTRIBUTE = "_tensor_args";
+
 }  // namespace ttnn::program_spec
