@@ -25,7 +25,7 @@ void reduce_scatter_common_validates(
         topology == ::ttnn::ccl::Topology::Ring || topology == ::ttnn::ccl::Topology::Linear,
         "topology must be Ring or Linear");
     TT_FATAL(
-        page_size % input_tensor.buffer()->alignment() == 0,
+        page_size % input_tensor.mesh_buffer().alignment() == 0,
         "reduce_scatter_minimal_async currently requires aligned pages");
 
     TT_FATAL(input_tensor.storage_type() == StorageType::DEVICE, "Operands to all_gather need to be on device!");

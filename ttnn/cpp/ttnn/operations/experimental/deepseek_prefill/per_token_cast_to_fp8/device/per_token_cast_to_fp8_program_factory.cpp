@@ -100,7 +100,7 @@ KernelIds build_kernels_and_cbs(
     const uint32_t output_e4m3_block_bytes = block_w;                // one 128-element row, 1 byte/elem
     const uint32_t in_tile_bytes = tile_h * tile_w * in_elem_bytes;  // cb_in page = one input tile
     const uint32_t output_e4m3_page_bytes = tile_h * tile_w;         // cb_output_e4m3 page = one tile
-    const uint32_t scale_aligned_page_bytes = output_scale.buffer()->aligned_page_size();
+    const uint32_t scale_aligned_page_bytes = output_scale.mesh_buffer().aligned_page_size();
 
     auto* src_buffer = input.buffer();
     auto* dst_e4m3_buffer = output_e4m3.buffer();
@@ -242,7 +242,7 @@ ttnn::device_operation::CachedProgram<PerTokenCastToFp8SharedVariables> create_p
     const auto tile_shape = input.tensor_spec().tile().get_tile_shape();
     const uint32_t tile_h = tile_shape[0];
     const uint32_t scale_blocks_per_row = H / fp8::BLOCK_W;  // 128-wide column-blocks per row
-    const uint32_t scale_page_bytes = output_scale.buffer()->aligned_page_size();
+    const uint32_t scale_page_bytes = output_scale.mesh_buffer().aligned_page_size();
 
     // Work-split unit, scale-scratch size, and kernel define differ by layout. TILE also needs a bit of
     // extra geometry (computed here) to build its per-core args in the loop below.

@@ -95,7 +95,7 @@ PerTokenCastBackProgramFactory::cached_program_t PerTokenCastBackProgramFactory:
     const uint32_t out_block_bytes = block_w * out_elem_bytes;         // one 128-element row of output
     const uint32_t input_e4m3_tile_bytes = tile_h * tile_w;            // cb_input_e4m3 page = one e4m3 tile
     const uint32_t out_tile_bytes = tile_h * tile_w * out_elem_bytes;  // cb_out page = one output tile
-    const uint32_t scale_aligned_page_bytes = input_scale.buffer()->aligned_page_size();
+    const uint32_t scale_aligned_page_bytes = input_scale.mesh_buffer().aligned_page_size();
 
     // Token-count-aware-only metadata tensors (unset on the plain path).
     const Tensor* expert_region_offsets = token_count_aware ? &tensor_args.expert_region_offsets.value() : nullptr;

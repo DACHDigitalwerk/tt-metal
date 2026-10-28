@@ -202,7 +202,7 @@ std::pair<bool, std::string> ReshardDeviceOperation::validate_inputs(
             const uint32_t alignment = hal::get_l1_alignment();
 
             uint32_t input_page_size = input_tensor.buffer()->page_size();
-            uint32_t input_aligned_page_size = input_tensor.buffer()->aligned_page_size();
+            uint32_t input_aligned_page_size = input_tensor.mesh_buffer().aligned_page_size();
             if (input_page_size != input_aligned_page_size) {
                 return {
                     false,

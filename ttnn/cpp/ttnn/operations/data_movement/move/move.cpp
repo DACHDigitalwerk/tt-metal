@@ -82,7 +82,7 @@ inline Tensor move_impl(const Tensor& input_tensor, const std::optional<MemoryCo
         output_tensor.buffer()->size(),
         output_tensor.buffer()->page_size(),
         num_banks,
-        output_tensor.buffer()->alignment());
+        output_tensor.mesh_buffer().alignment());
 
     // If input and output buffers overlap, input has to be copied into circular buffer before writing to output
     // Only compute with storage cores allow CBs to be created

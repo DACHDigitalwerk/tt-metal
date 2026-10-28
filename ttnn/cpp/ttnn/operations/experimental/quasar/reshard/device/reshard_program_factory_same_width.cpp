@@ -81,8 +81,8 @@ ttnn::device_operation::ProgramArtifacts ReshardSameWidthFactory<local_is_output
         local_units_per_shard = local_shard_spec.shape[0];
         remote_units_per_shard = remote_shard_spec.shape[0];
     }
-    uint32_t local_unit_size_padded = tt::align(unit_size, local_tensor.buffer()->alignment());
-    uint32_t remote_unit_size_padded = tt::align(unit_size, remote_tensor.buffer()->alignment());
+    uint32_t local_unit_size_padded = tt::align(unit_size, local_tensor.mesh_buffer().alignment());
+    uint32_t remote_unit_size_padded = tt::align(unit_size, remote_tensor.mesh_buffer().alignment());
     bool unaligned = false;
     if (remote_unit_size_padded != unit_size || local_unit_size_padded != unit_size) {
         unaligned = true;

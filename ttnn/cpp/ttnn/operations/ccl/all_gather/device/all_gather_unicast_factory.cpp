@@ -106,8 +106,8 @@ tt::tt_metal::ProgramDescriptor build_unicast_descriptor_at(
     // connection and multiplex traffic.
     // This is a major perf knob, below heuristic was determined from extensive test sweeps.
     uint32_t num_links = operation_attributes.axis_num_links[axis];
-    const uint32_t input_page_size = input_tensor.buffer()->aligned_page_size();
-    const uint32_t output_page_size = output_tensor.buffer()->aligned_page_size();
+    const uint32_t input_page_size = input_tensor.mesh_buffer().aligned_page_size();
+    const uint32_t output_page_size = output_tensor.mesh_buffer().aligned_page_size();
     uint32_t workers_per_dir = 1;
     if (input_tensor.device()->arch() == tt::ARCH::WORMHOLE_B0) {
         workers_per_dir = 2;

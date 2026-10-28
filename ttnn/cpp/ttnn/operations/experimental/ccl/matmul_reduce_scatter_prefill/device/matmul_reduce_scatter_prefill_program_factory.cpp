@@ -478,8 +478,8 @@ ProgramDescriptor MatmulReduceScatterPrefillProgramFactory::create_descriptor(
     const uint32_t rW = (resident && scatter_dim == -2) ? 1 : 0;
     const uint32_t a_pages = rA != 0 ? core_m * Kt : plan.depths[0] * win_m * kb;
     const uint32_t w_pages = rW != 0 ? Kt * core_n : plan.depths[1] * kb * win_n;
-    const auto tA = static_cast<uint32_t>(a.buffer()->aligned_page_size());
-    const auto tW = static_cast<uint32_t>(w.buffer()->aligned_page_size());
+    const auto tA = static_cast<uint32_t>(a.mesh_buffer().aligned_page_size());
+    const auto tW = static_cast<uint32_t>(w.mesh_buffer().aligned_page_size());
     const uint32_t a_row_per_block = scatter_dim == -2 ? block_m : 0;
     const uint32_t w_col_per_block = scatter_dim == -1 ? block_n : 0;
 

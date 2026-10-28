@@ -102,7 +102,7 @@ tt::tt_metal::ProgramDescriptor GroupedMatmulDeviceOperation::create_descriptor(
     const uint32_t input_page_bytes = tt::round_up(plain_tile.get_tile_size(input_format), dram_alignment);
     const uint32_t weight_page_bytes = tt::round_up(weight_tile.get_tile_size(weight_format), dram_alignment);
     const uint32_t output_tile_bytes = plain_tile.get_tile_size(output_format);
-    const uint32_t counts_page_bytes = static_cast<uint32_t>(counts.buffer()->aligned_page_size());
+    const uint32_t counts_page_bytes = static_cast<uint32_t>(counts.mesh_buffer().aligned_page_size());
     // The compute kernel's schedule: a word per expert.
     const uint32_t schedule_bytes = tt::round_up(
         layout.num_experts * static_cast<uint32_t>(sizeof(uint32_t)), tt::tt_metal::hal::get_l1_alignment());

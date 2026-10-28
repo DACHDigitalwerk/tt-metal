@@ -207,7 +207,7 @@ ProgramDescriptor AllReduceCreateQkvHeadsMeshWorkloadFactory::create_descriptor(
     tt::DataFormat cb_batch_offset_data_format =
         tt::tt_metal::datatype_to_dataformat_converter(batch_offset_tensor.dtype());
     uint32_t single_batch_offset_tile_size = tt::tile_size(cb_batch_offset_data_format);
-    batch_offset_index_stick_size = batch_offset_tensor.buffer()->aligned_page_size();
+    batch_offset_index_stick_size = batch_offset_tensor.mesh_buffer().aligned_page_size();
 
     desc.cbs.push_back(CBDescriptor{
         .total_size = single_batch_offset_tile_size,

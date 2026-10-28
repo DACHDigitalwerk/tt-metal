@@ -187,9 +187,9 @@ void DitFusedDistributedRmsnormDeviceOperation::validate_on_program_cache_miss(
             map.logical_shape()[-1],
             input_tile_rows);
         TT_FATAL(
-            map.buffer()->aligned_page_size() <= 65536u,
+            map.mesh_buffer().aligned_page_size() <= 65536u,
             "affine_tile_row_map page ({} B) exceeds the 64 KiB reader buffer",
-            map.buffer()->aligned_page_size());
+            map.mesh_buffer().aligned_page_size());
         const bool pt_w = weight.has_value() && weight->logical_shape()[-2] > 1;
         const bool pt_b = bias.has_value() && bias->logical_shape()[-2] > 1;
         TT_FATAL(pt_w || pt_b, "affine_tile_row_map needs a per-token ([.., rows, H]) weight or bias");

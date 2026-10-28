@@ -84,10 +84,10 @@ void NpHaloDeviceOperation::validate_on_program_cache_miss(
         args.np_pad2_left,
         args.np_pad2_right);
     TT_FATAL(
-        halo_buffer.buffer()->aligned_page_size() == input_tensor.buffer()->aligned_page_size(),
+        halo_buffer.mesh_buffer().aligned_page_size() == input_tensor.mesh_buffer().aligned_page_size(),
         "NpHalo: halo_buffer page size ({} B) must match the input's ({} B); the exchange moves whole sticks.",
-        halo_buffer.buffer()->aligned_page_size(),
-        input_tensor.buffer()->aligned_page_size());
+        halo_buffer.mesh_buffer().aligned_page_size(),
+        input_tensor.mesh_buffer().aligned_page_size());
 }
 
 TensorSpec NpHaloDeviceOperation::compute_output_specs(

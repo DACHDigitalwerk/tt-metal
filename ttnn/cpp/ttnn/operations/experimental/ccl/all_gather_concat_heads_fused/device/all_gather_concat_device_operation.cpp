@@ -23,7 +23,7 @@ void AllGatherConcatDeviceOperation::validate_on_program_cache_miss(
     const auto& page_size = input_tensor.buffer()->page_size();
     const auto input_core_ranges = input_tensor.buffer()->shard_spec().grid().ranges();
     const auto& padded_input_shape = input_tensor.padded_shape();
-    TT_FATAL(page_size % input_tensor.buffer()->alignment() == 0, "All Gather currently requires aligned pages");
+    TT_FATAL(page_size % input_tensor.mesh_buffer().alignment() == 0, "All Gather currently requires aligned pages");
     TT_FATAL(
         (input_tensor.device()->arch() != tt::ARCH::BLACKHOLE) ||
             (input_tensor.memory_config().buffer_type() != BufferType::DRAM),

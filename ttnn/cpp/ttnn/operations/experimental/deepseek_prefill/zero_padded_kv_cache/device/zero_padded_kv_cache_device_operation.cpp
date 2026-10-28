@@ -356,7 +356,7 @@ tt::tt_metal::ProgramDescriptor ZeroPaddedKvCacheDeviceOperation::ProgramFactory
     if (is_row_major) {
         // A row is one opaque DRAM page. Use a dataflow-only zero writer so FP8 never enters the
         // unpack/compute engine (and therefore needs no fp32 destination accumulator setting).
-        const uint32_t row_page_size = cache.buffer()->aligned_page_size();
+        const uint32_t row_page_size = cache.mesh_buffer().aligned_page_size();
         desc.cbs.push_back(CBDescriptor{
             .total_size = row_page_size,
             .core_ranges = all_cores,

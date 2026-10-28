@@ -139,7 +139,7 @@ DitFusedDistributedGroupnormMeshWorkloadFactory::create_at(
     const uint32_t block_wt_last = (per_core_Nt + num_groups_per_core - 1) / num_groups_per_core;
     const uint32_t input_mask_num_tiles_per_core = block_wt * num_groups_per_core;
     const uint32_t per_core_N_bytes_padded =
-        tt::round_up(per_core_N * datum_size_bytes, output_tensor.buffer()->alignment());
+        tt::round_up(per_core_N * datum_size_bytes, output_tensor.mesh_buffer().alignment());
 
     // num_out_blocks: L1 safety net that splits the (now per-core) block height so height-scaled CBs
     // fit L1. With the multi-core split per_core_M is small, so this is typically 1. The stock

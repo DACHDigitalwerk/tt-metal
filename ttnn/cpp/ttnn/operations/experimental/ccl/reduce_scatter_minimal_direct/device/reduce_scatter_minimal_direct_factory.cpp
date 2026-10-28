@@ -332,12 +332,12 @@ tt::tt_metal::ProgramDescriptor build_program_descriptor_at(
 
     if (arrivals_in_cb) {
         TT_FATAL(
-            staging.buffer()->aligned_page_size() * staging.buffer()->shard_spec().shape()[0] ==
+            staging.mesh_buffer().aligned_page_size() * staging.buffer()->shard_spec().shape()[0] ==
                 cb_reduce_pages * cb_page_size,
             "sharded staging shard ({} rows x {} B) must be exactly the reduce CB ({} tiles x {} B); the "
             "staging spec and the factory disagree on the shard geometry",
             staging.buffer()->shard_spec().shape()[0],
-            staging.buffer()->aligned_page_size(),
+            staging.mesh_buffer().aligned_page_size(),
             cb_reduce_pages,
             cb_page_size);
     }

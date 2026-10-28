@@ -57,7 +57,7 @@ ttnn::device_operation::ProgramArtifacts IndexedEntryCopyProgramFactory::create_
 
     // Validation equates page sizes and both sides are DRAM, so their aligned page sizes match.
     const uint32_t page_size = source.buffer()->page_size();
-    const uint32_t page_stride = source.buffer()->aligned_page_size();
+    const uint32_t page_stride = source.mesh_buffer().aligned_page_size();
 
     const auto grid = source.device()->compute_with_storage_grid_size();
     auto [num_cores, all_cores, core_group_1, core_group_2, pages_per_core_1, pages_per_core_2] =
@@ -134,7 +134,7 @@ ttnn::device_operation::ProgramArtifacts IndexedEntryCopyProgramFactory::create_
     }
     KernelRunArgs writer_run_args{.kernel = WRITER, .runtime_arg_values = reader_run_args.runtime_arg_values};
 
-    const uint32_t index_word_size = index.buffer()->aligned_page_size();
+    const uint32_t index_word_size = index.mesh_buffer().aligned_page_size();
     ProgramSpec spec{
         .name = "indexed_entry_copy",
         .kernels = {std::move(reader), std::move(writer)},

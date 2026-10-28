@@ -188,8 +188,8 @@ MatmulReduceScatterPrefillParams resolve_params(
         .block_n = canonical_dim == -2 ? Nt : Nt / G,
         .gx = static_cast<uint32_t>(grid.x),
         .gy = static_cast<uint32_t>(grid.y),
-        .tA = static_cast<uint32_t>(input_tensor.buffer()->aligned_page_size()),
-        .tW = static_cast<uint32_t>(weight.buffer()->aligned_page_size()),
+        .tA = static_cast<uint32_t>(input_tensor.mesh_buffer().aligned_page_size()),
+        .tW = static_cast<uint32_t>(weight.mesh_buffer().aligned_page_size()),
         .scatter_dim = canonical_dim,
         .budget = l1_bank - headroom,
     };
@@ -215,7 +215,7 @@ void plan_for_held_staging(MatmulReduceScatterPrefillParams& params, const Tenso
     if (staging.storage_type() != StorageType::DEVICE || !staging.is_allocated()) {
         return;  // refused by validation
     }
-    const uint64_t held = staging.buffer()->aligned_size_per_bank();
+    const uint64_t held = staging.mesh_buffer().aligned_size_per_bank();
     const uint64_t needed =
         static_cast<uint64_t>(detail::staging_tiles(params.plan())) * tt::tile_size(tt::DataFormat::Float16_b);
     if (held > needed) {

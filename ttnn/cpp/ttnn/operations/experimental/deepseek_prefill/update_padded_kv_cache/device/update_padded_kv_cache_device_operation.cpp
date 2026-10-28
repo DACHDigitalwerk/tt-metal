@@ -631,7 +631,7 @@ tt::tt_metal::ProgramDescriptor UpdatePaddedKvCacheDeviceOperation::ProgramFacto
         writer_tile_height = TILE_HEIGHT;
     } else if (is_row_major) {
         // ROW_MAJOR: page = one token row; use the buffer's aligned page size (handles row padding).
-        single_page_size = cache.buffer()->aligned_page_size();
+        single_page_size = cache.mesh_buffer().aligned_page_size();
         Wt = 1;
         input_Ht = input_shape[-2];
         cache_HtWt = cache_shape[-2];

@@ -134,10 +134,10 @@ void validate_staging(const MatmulReduceScatterPrefillParams& attrs, const Matmu
     const uint32_t staging_tiles = detail::staging_tiles(attrs.plan());
     const uint64_t needed = static_cast<uint64_t>(staging_tiles) * tt::tile_size(tt::DataFormat::Float16_b);
     TT_FATAL(
-        staging.buffer()->aligned_size_per_bank() >= needed,
+        staging.mesh_buffer().aligned_size_per_bank() >= needed,
         "matmul_reduce_scatter_prefill: staging_tensor holds {} bytes per core; this call needs {} ({} tiles; "
         "ttnn.experimental.matmul_reduce_scatter_prefill_staging sizes one)",
-        staging.buffer()->aligned_size_per_bank(),
+        staging.mesh_buffer().aligned_size_per_bank(),
         needed,
         staging_tiles);
 }

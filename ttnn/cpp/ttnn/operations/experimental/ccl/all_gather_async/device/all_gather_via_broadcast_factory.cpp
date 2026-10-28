@@ -90,8 +90,8 @@ tt::tt_metal::ProgramDescriptor build_descriptor_at(
 
     const uint32_t MAX_PACKET_SIZE_BYTES =
         std::bit_floor(tt::tt_fabric::get_tt_fabric_channel_buffer_size_bytes(*input_tensor.device()));
-    const uint32_t input_page_size = input_tensor.buffer()->aligned_page_size();
-    const uint32_t output_page_size = output_tensor.buffer()->aligned_page_size();
+    const uint32_t input_page_size = input_tensor.mesh_buffer().aligned_page_size();
+    const uint32_t output_page_size = output_tensor.mesh_buffer().aligned_page_size();
     uint32_t cb_page_size = std::lcm(std::lcm(input_page_size, output_page_size), MAX_PACKET_SIZE_BYTES);
 
     if (input_tensor.layout() == ttnn::TILE_LAYOUT) {

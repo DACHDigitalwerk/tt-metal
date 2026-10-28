@@ -742,7 +742,7 @@ HighBwAllGatherFabricFactory::cached_mesh_workload_t HighBwAllGatherFabricFactor
         tt::tt_metal::distributed::Synchronize(*mesh_device, std::nullopt, subdevices);
     }
 
-    const uint32_t page_bytes = input.buffer()->aligned_page_size();
+    const uint32_t page_bytes = input.mesh_buffer().aligned_page_size();
     const uint32_t fabric_payload_bytes = static_cast<uint32_t>(args.packet_size);
     // a page larger than the payload is a chunk of its own, sent as several packets
     const uint32_t pages_per_fabric_chunk = std::max<uint32_t>(1, fabric_payload_bytes / page_bytes);

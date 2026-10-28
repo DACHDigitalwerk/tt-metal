@@ -168,10 +168,10 @@ void validate_allocations(
         TT_FATAL(tensor->is_allocated(), "combine_fabric2d: {} has no device buffer", name);
     }
     TT_FATAL(
-        output.buffer()->aligned_page_size() == token_size_bytes(tensor_args),
+        output.mesh_buffer().aligned_page_size() == token_size_bytes(tensor_args),
         "combine_fabric2d: output page size {} must equal the token page size {} — the op moves whole tokens "
         "between the two",
-        output.buffer()->aligned_page_size(),
+        output.mesh_buffer().aligned_page_size(),
         token_size_bytes(tensor_args));
     TT_FATAL(
         output.buffer()->num_pages() >= args.seq_len_per_chip * args.num_experts_per_tok,

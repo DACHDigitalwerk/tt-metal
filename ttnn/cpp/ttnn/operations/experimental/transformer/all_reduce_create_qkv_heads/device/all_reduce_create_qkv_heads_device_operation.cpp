@@ -39,10 +39,10 @@ void AllReduceCreateQkvHeadsDeviceOperation::validate_on_program_cache_miss(
 
     const auto& page_size = input_tensor.buffer()->page_size();
     TT_FATAL(
-        page_size % input_tensor.buffer()->alignment() == 0,
+        page_size % input_tensor.mesh_buffer().alignment() == 0,
         "All Gather currently requires aligned pages. page_size={}, alignment={}",
         page_size,
-        input_tensor.buffer()->alignment());
+        input_tensor.mesh_buffer().alignment());
 
     TT_FATAL(
         operation_attributes.ring_size % 2 == 0,

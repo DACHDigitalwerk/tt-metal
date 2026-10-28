@@ -279,7 +279,7 @@ tt::tt_metal::Program build_program(
     // The writer's output ring: 32 token ids, each in its own slot of at least 32 B and at least one aligned output
     // page, since the writer sends whole aligned pages (64 B in Blackhole DRAM). The writer gets this size as a
     // compile-time arg and checks it against its output accessor's page.
-    const uint32_t output_slot_bytes = std::max(32U, static_cast<uint32_t>(output.buffer()->aligned_page_size()));
+    const uint32_t output_slot_bytes = std::max(32U, static_cast<uint32_t>(output.mesh_buffer().aligned_page_size()));
     create_circular_buffer_bytes(
         program,
         layout.all_cores,
@@ -300,7 +300,7 @@ tt::tt_metal::Program build_program(
     // spans at most (n - 1) / Wt + 2 entries. Sizing by num_entries instead would scale the L1 and
     // read footprint with the global batch rather than a core's share of it.
     if (layout.position_aware) {
-        const uint32_t slot_bytes = static_cast<uint32_t>(tensor_args.positions->buffer()->aligned_page_size());
+        const uint32_t slot_bytes = static_cast<uint32_t>(tensor_args.positions->mesh_buffer().aligned_page_size());
         const uint32_t max_local_entries =
             std::min(layout.num_entries, (layout.tiles_per_core_group_1 - 1U) / layout.Wt + 2U);
         for (auto cb_index : {kReaderPositionsCbIndex, kWriterPositionsCbIndex}) {

@@ -111,7 +111,9 @@ uint32_t get_num_pages(const ttnn::Tensor& tensor) { return (uint32_t)tensor.buf
 
 uint32_t get_page_size(const ttnn::Tensor& tensor) { return (uint32_t)tensor.buffer()->page_size(); }
 
-uint32_t get_aligned_page_size(const ttnn::Tensor& tensor) { return (uint32_t)tensor.buffer()->aligned_page_size(); }
+uint32_t get_aligned_page_size(const ttnn::Tensor& tensor) {
+    return (uint32_t)tensor.mesh_buffer().aligned_page_size();
+}
 
 uint32_t get_num_rows(const ttnn::Tensor& tensor) {
     auto logical_volume = tensor.logical_shape().volume();

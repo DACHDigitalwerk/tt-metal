@@ -164,7 +164,7 @@ tt::tt_metal::ProgramDescriptor MoePaddingConfigDeviceOperation::ProgramFactory:
 
     // Write the config row a full page at a time (the row may be padded up to the buffer's aligned
     // page size); the kernel zeroes the slot first so the padding bytes are deterministic.
-    const uint32_t out_page_size = config.buffer()->aligned_page_size();
+    const uint32_t out_page_size = config.mesh_buffer().aligned_page_size();
 
     tt::tt_metal::ProgramDescriptor desc;
 

@@ -202,7 +202,7 @@ tt::tt_metal::ProgramDescriptor build_multicast_descriptor_at(
     // and device index.
     ////////////////////////////////////////////////////////////////
 
-    const uint32_t input_page_size = input_tensor.buffer()->aligned_page_size();
+    const uint32_t input_page_size = input_tensor.mesh_buffer().aligned_page_size();
     const auto& input_shape = input_tensor.padded_shape();
 
     // --- Copy mode ---

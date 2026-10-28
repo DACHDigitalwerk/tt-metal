@@ -95,7 +95,7 @@ ProgramDescriptor RecvDirectAsyncProgramFactory::create_descriptor(
 
     auto max_alignment = std::max(
         target_device->allocator()->get_alignment(mesh_socket.get_config().socket_mem_config.socket_storage_type),
-        output_tensor.buffer()->alignment());
+        output_tensor.mesh_buffer().alignment());
 
     uint32_t handshake_page_size = ttnn::send_recv_utils::handshake_page_size(max_alignment);
 

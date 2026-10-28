@@ -95,9 +95,9 @@ ProgramDescriptor SendDirectAsyncProgramFactory::create_descriptor(
 
     auto max_alignment = std::max(
         target_device->allocator()->get_alignment(mesh_socket.get_config().socket_mem_config.socket_storage_type),
-        input_tensor.buffer()->alignment());
+        input_tensor.mesh_buffer().alignment());
 
-    auto input_page_size = input_tensor.buffer()->aligned_page_size();
+    auto input_page_size = input_tensor.mesh_buffer().aligned_page_size();
     auto socket_aligned_page_size = tt::align(input_page_size, max_alignment);
     auto total_num_pages = input_tensor.buffer()->num_pages();
 

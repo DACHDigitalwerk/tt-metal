@@ -182,7 +182,7 @@ void TilizeWithValPaddingDeviceOperation::validate_on_program_cache_miss(
 
         const uint32_t page_size_bytes = input_tensor.buffer()->page_size();
         TT_FATAL(
-            page_size_bytes == input_tensor.buffer()->aligned_page_size(),
+            page_size_bytes == input_tensor.mesh_buffer().aligned_page_size(),
             "Input row-major shard width {} gives page size {} bytes, which must be aligned to {} bytes L1 SRAM "
             "buffer alignment "
             "requirement",

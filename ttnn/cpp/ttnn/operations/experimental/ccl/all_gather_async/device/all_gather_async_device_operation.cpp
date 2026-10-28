@@ -89,7 +89,7 @@ void AllGatherAsyncDeviceOperation::validate_on_program_cache_miss(
             !args.use_all_gather_async_llama_sharded,
         "This kernel does not support blackhole dram as it does not use an accessor to get the noc address as needed "
         "by the fabric api");
-    TT_FATAL(page_size % input_tensor.buffer()->alignment() == 0, "All Gather currently requires aligned pages");
+    TT_FATAL(page_size % input_tensor.mesh_buffer().alignment() == 0, "All Gather currently requires aligned pages");
 
     TT_FATAL(input_tensor.storage_type() == StorageType::DEVICE, "Operands to all_gather need to be on device!");
     TT_FATAL(input_tensor.is_allocated(), "Operands to all_gather need to be allocated in buffers on device!");

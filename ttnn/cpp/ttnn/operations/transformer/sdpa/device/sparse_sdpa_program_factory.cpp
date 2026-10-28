@@ -77,7 +77,7 @@ tt::tt_metal::ProgramDescriptor SparseSDPAOperation::SparseSDPAProgramFactory::c
     const uint32_t out_elem_bytes = output.element_size();
     const uint32_t q_row_bytes = k_dim * q_elem_bytes;
     const uint32_t k_row_bytes = k_dim * kv_elem_bytes;
-    const uint32_t packed_page_bytes = scaled_kv ? t.kv.buffer()->aligned_page_size() : 0;
+    const uint32_t packed_page_bytes = scaled_kv ? t.kv.mesh_buffer().aligned_page_size() : 0;
     const uint32_t scale_blocks = ::sparse_sdpa::scale_block_count(v_dim);
     constexpr tt::DataFormat bf = tt::DataFormat::Float16_b;
     constexpr tt::DataFormat fp32 = tt::DataFormat::Float32;
