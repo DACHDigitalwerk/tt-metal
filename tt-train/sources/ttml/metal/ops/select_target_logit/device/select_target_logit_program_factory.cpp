@@ -113,23 +113,23 @@ CreatedProgram create_program_for_device(
 
     create_circular_buffer(program, all_cores, kOutputCbIndex, output_data_format, output_tile_bytes, kNumOutputTiles);
 
-    auto* logit_buffer = logit.buffer();
+    auto* logit_buffer = &logit.mesh_buffer();
     TT_FATAL(
-        logit_buffer->buffer_type() == ttnn::BufferType::DRAM,
+        logit_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "select_target_logit: logit buffer must be DRAM, got {}",
-        enchantum::to_string(logit_buffer->buffer_type()));
+        enchantum::to_string(logit_buffer->device_local_config().buffer_type));
 
-    auto* target_buffer = target.buffer();
+    auto* target_buffer = &target.mesh_buffer();
     TT_FATAL(
-        target_buffer->buffer_type() == ttnn::BufferType::DRAM,
+        target_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "select_target_logit: target buffer must be DRAM, got {}",
-        enchantum::to_string(target_buffer->buffer_type()));
+        enchantum::to_string(target_buffer->device_local_config().buffer_type));
 
-    auto* output_buffer = output.buffer();
+    auto* output_buffer = &output.mesh_buffer();
     TT_FATAL(
-        output_buffer->buffer_type() == ttnn::BufferType::DRAM,
+        output_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "select_target_logit: output buffer must be DRAM, got {}",
-        enchantum::to_string(output_buffer->buffer_type()));
+        enchantum::to_string(output_buffer->device_local_config().buffer_type));
 
     std::vector<uint32_t> reader_ct_args{Wt, Ht, target_page_size, target_read_page_size};
     tt::tt_metal::TensorAccessorArgs(logit_buffer).append_to(reader_ct_args);
@@ -240,9 +240,9 @@ void SelectTargetLogitProgramFactory::override_runtime_arguments(
     const operation_attributes_t& operation_attributes,
     const tensor_args_t& tensor_args,
     tensor_return_value_t& tensor_return_value) {
-    auto* logit_buffer = tensor_args.logit.buffer();
-    auto* target_buffer = tensor_args.target.buffer();
-    auto* output_buffer = tensor_return_value.buffer();
+    auto* logit_buffer = &tensor_args.logit.mesh_buffer();
+    auto* target_buffer = &tensor_args.target.mesh_buffer();
+    auto* output_buffer = &tensor_return_value.mesh_buffer();
 
     auto* mesh_device = tensor_args.logit.device();
     const auto mesh_shape = mesh_device->shape();

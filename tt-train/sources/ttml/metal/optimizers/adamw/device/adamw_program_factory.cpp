@@ -249,12 +249,12 @@ AdamWProgramFactory::cached_program_t AdamWProgramFactory::create(
     // 3) Create reader/writer kernels
     // -------------------------------------------------------------------------
 
-    auto* param_buffer = param.buffer();
-    auto* grad_buffer = grad.buffer();
-    auto* exp_avg_buffer = exp_avg.buffer();
-    auto* exp_avg_sq_buffer = exp_avg_sq.buffer();
+    auto* param_buffer = &param.mesh_buffer();
+    auto* grad_buffer = &grad.mesh_buffer();
+    auto* exp_avg_buffer = &exp_avg.mesh_buffer();
+    auto* exp_avg_sq_buffer = &exp_avg_sq.mesh_buffer();
     auto* max_exp_avg_sq_buffer = max_exp_avg_sq_opt.has_value() ? max_exp_avg_sq_opt.value().buffer() : nullptr;
-    auto* output_buffer = output.buffer();
+    auto* output_buffer = &output.mesh_buffer();
 
     std::map<std::string, std::string> defines;
     defines["AMSGRAD"] = operation_attributes.amsgrad ? "1" : "0";
@@ -399,13 +399,13 @@ void AdamWProgramFactory::override_runtime_arguments(
 
     const auto& attrs = operation_attributes;
 
-    auto* param_buffer = tensor_args.param.buffer();
-    auto* grad_buffer = tensor_args.grad.buffer();
-    auto* exp_avg_buffer = tensor_args.exp_avg.buffer();
-    auto* exp_avg_sq_buffer = tensor_args.exp_avg_sq.buffer();
+    auto* param_buffer = &tensor_args.param.mesh_buffer();
+    auto* grad_buffer = &tensor_args.grad.mesh_buffer();
+    auto* exp_avg_buffer = &tensor_args.exp_avg.mesh_buffer();
+    auto* exp_avg_sq_buffer = &tensor_args.exp_avg_sq.mesh_buffer();
     auto* max_exp_avg_sq_buffer =
         tensor_args.max_exp_avg_sq.has_value() ? tensor_args.max_exp_avg_sq.value().buffer() : nullptr;
-    auto* output_buffer = tensor_return_value.buffer();
+    auto* output_buffer = &tensor_return_value.mesh_buffer();
 
     // Only address arguments need updating here; tile counts remain the same as in create().
     auto& reader_runtime_args = GetRuntimeArgs(program, reader_kernel_id);

@@ -80,8 +80,8 @@ ttnn::device_operation::ProgramArtifacts TypecastRowMajorChunkedProgramFactory::
 
     const auto* device = input.device();
 
-    Buffer* src_buffer = input.buffer();
-    Buffer* dst_buffer = output.buffer();
+    auto* src_buffer = &input.mesh_buffer();
+    auto* dst_buffer = &output.mesh_buffer();
 
     // Get row information
     const auto& padded_shape = input.padded_shape();

@@ -216,10 +216,10 @@ SGDProgramFactory::cached_program_t SGDProgramFactory::create(
     // 3) Create reader/writer kernels
     // -------------------------------------------------------------------------
 
-    auto* param_buffer = param.buffer();
-    auto* grad_buffer = grad.buffer();
+    auto* param_buffer = &param.mesh_buffer();
+    auto* grad_buffer = &grad.mesh_buffer();
     auto* momentum_buffer = momentum_wrapped.has_value() ? momentum_wrapped.value().buffer() : nullptr;
-    auto* output_buffer = output.buffer();
+    auto* output_buffer = &output.mesh_buffer();
 
     std::map<std::string, std::string> defines;
     defines["USE_MOMENTUM"] = momentum_buffer != nullptr ? "1" : "0";
@@ -340,8 +340,8 @@ void SGDProgramFactory::override_runtime_arguments(
     uint32_t num_cores = shared_variables.num_cores;
     uint32_t num_cores_y = shared_variables.num_cores_y;
 
-    auto* param_buffer = tensor_args.param.buffer();
-    auto* grad_buffer = tensor_args.grad.buffer();
+    auto* param_buffer = &tensor_args.param.mesh_buffer();
+    auto* grad_buffer = &tensor_args.grad.mesh_buffer();
     auto* momentum_buffer =
         tensor_args.momentum_buffer.has_value() ? tensor_args.momentum_buffer.value().buffer() : nullptr;
 
@@ -350,7 +350,7 @@ void SGDProgramFactory::override_runtime_arguments(
     auto dampening = operation_attributes.dampening;
     auto weight_decay = operation_attributes.weight_decay;
 
-    auto* output_buffer = tensor_return_value.buffer();
+    auto* output_buffer = &tensor_return_value.mesh_buffer();
 
     // Only address arguments need updating here; tile counts remain the same as in create().
     auto& reader_runtime_args = GetRuntimeArgs(program, sgd_reader_kernel_id);

@@ -155,9 +155,9 @@ ttnn::device_operation::ProgramArtifacts IndexedFillProgramFactory::create_progr
 
     const bool is_tile = input_a.layout() == Layout::TILE;
 
-    Buffer* input_a_buffer = input_a.buffer();
-    Buffer* input_b_buffer = input_b.buffer();
-    Buffer* output_buffer = output.buffer();
+    auto* input_a_buffer = &input_a.mesh_buffer();
+    auto* input_b_buffer = &input_b.mesh_buffer();
+    auto* output_buffer = &output.mesh_buffer();
 
     // -----------------------------------------------------------------------------------
     // Path selection

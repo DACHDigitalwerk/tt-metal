@@ -108,17 +108,17 @@ FrobeniusNormalizeProgramFactory::cached_program_t FrobeniusNormalizeProgramFact
     // -------------------------------------------------------------------------
     // 4) Create kernels
     // -------------------------------------------------------------------------
-    auto* input_buffer = input.buffer();
-    auto* output_buffer = output[0].buffer();
+    auto* input_buffer = &input.mesh_buffer();
+    auto* output_buffer = &output[0].mesh_buffer();
 
     TT_FATAL(
-        input_buffer->buffer_type() == ttnn::BufferType::DRAM,
+        input_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "Input buffer must be in DRAM. Got {}",
-        enchantum::to_string(input_buffer->buffer_type()));
+        enchantum::to_string(input_buffer->device_local_config().buffer_type));
     TT_FATAL(
-        output_buffer->buffer_type() == ttnn::BufferType::DRAM,
+        output_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "Output buffer must be in DRAM. Got {}",
-        enchantum::to_string(output_buffer->buffer_type()));
+        enchantum::to_string(output_buffer->device_local_config().buffer_type));
 
     // Origin = core (0,0)
     tt::tt_metal::CoreCoord origin_core{0, 0};
@@ -240,8 +240,8 @@ void FrobeniusNormalizeProgramFactory::override_runtime_arguments(
     auto& shared = cached_program.shared_variables;
     auto& program = cached_program.program;
 
-    auto* input_buffer = tensor_args.input.buffer();
-    auto* output_buffer = output[0].buffer();
+    auto* input_buffer = &tensor_args.input.mesh_buffer();
+    auto* output_buffer = &output[0].mesh_buffer();
 
     auto& reader_rt = GetRuntimeArgs(program, shared.reader_kernel_id);
     auto& reader_origin_rt = GetRuntimeArgs(program, shared.reader_origin_id);

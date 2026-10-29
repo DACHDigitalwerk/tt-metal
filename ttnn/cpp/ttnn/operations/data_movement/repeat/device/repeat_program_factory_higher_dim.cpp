@@ -62,15 +62,15 @@ ttnn::device_operation::ProgramArtifacts RepeatProgramFactoryHigherDim::create_p
         number_of_lower_pages = input_log_shape[2];
     }
     uint32_t read_start_page = 0;
-    Buffer* src_buffer = input.buffer();
-    Buffer* dst_buffer = output.buffer();
+    auto* src_buffer = &input.mesh_buffer();
+    auto* dst_buffer = &output.mesh_buffer();
     TT_FATAL(dst_buffer != nullptr, "Output buffer should be allocated on device!");
     const uint32_t cb_size_bytes = (READ_ALIGNMENT * 2) + page_size_bytes;
 
     // TILE/sharded -> tile; RM sharded -> rm_sharded; RM interleaved -> rm_interleaved.
     const bool is_tile_native = operation_attributes.m_tile_page_size_bytes > 0;
-    const bool src_sharded = src_buffer->buffer_distribution_spec().has_value();
-    const bool dst_sharded = dst_buffer->buffer_distribution_spec().has_value();
+    const bool src_sharded = src_buffer->device_local_config().sharding_args.buffer_distribution_spec().has_value();
+    const bool dst_sharded = dst_buffer->device_local_config().sharding_args.buffer_distribution_spec().has_value();
     const bool needs_alignment_cb = !is_tile_native && !src_sharded && !dst_sharded;
 
     // Metal 2.0 named resource ids. Declared function-local so the unity build (both repeat factory

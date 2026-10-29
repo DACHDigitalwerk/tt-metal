@@ -310,9 +310,9 @@ tt::tt_metal::Program build_program(
     }
 
     // Kernels.
-    auto* logits_buffer = logits.buffer();
+    auto* logits_buffer = &logits.mesh_buffer();
     auto* mask_buffer = has_mask ? tensor_args.logits_mask->buffer() : nullptr;
-    auto* output_buffer = output.buffer();
+    auto* output_buffer = &output.mesh_buffer();
 
     // Greedy vs noisy is decided by uses_gumbel_noise, NOT `temperature > 0`: a positive
     // temperature whose reciprocal overflows float32 must build the greedy kernel. The program

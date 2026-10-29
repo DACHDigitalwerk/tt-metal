@@ -78,8 +78,8 @@ SliceReshardAsyncProgramFactory::cached_program_t SliceReshardAsyncProgramFactor
     // Tensor Info
     const auto& input_tensor_shape = input_tensor.padded_shape();
     const auto& output_tensor_shape = output_tensor.padded_shape();
-    tt::tt_metal::Buffer* input_buffer = input_tensor.buffer();
-    tt::tt_metal::Buffer* output_buffer = output_tensor.buffer();
+    auto* input_buffer = &input_tensor.mesh_buffer();
+    auto* output_buffer = &output_tensor.mesh_buffer();
 
     // Get OP Config, topology config
     uint32_t page_size = input_tensor.mesh_buffer().page_size();
