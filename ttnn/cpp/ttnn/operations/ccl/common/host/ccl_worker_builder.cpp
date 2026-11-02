@@ -753,7 +753,8 @@ tt::tt_metal::KernelHandle generate_multi_command_stream_kernel_ct_args(
         std::vector<uint32_t> ct_args = {/*my_chip_id=*/0xFFFF, reserved_packet_header_CB_index};
         std::ranges::copy(
             std::array<uint32_t, 4>{
-                static_cast<uint32_t>(tensor.mesh_buffer().device_local_config().sharding_args.buffer_layout()),  // TODO: refactor out to generate_tensor_ct_args
+                // TODO: refactor out to generate_tensor_ct_args
+                static_cast<uint32_t>(tensor.mesh_buffer().device_local_config().sharding_args.buffer_layout()),
                 static_cast<uint32_t>(tensor.memory_config().buffer_type()),
                 static_cast<uint32_t>(tensor.layout()),
                 static_cast<uint32_t>(0)},
