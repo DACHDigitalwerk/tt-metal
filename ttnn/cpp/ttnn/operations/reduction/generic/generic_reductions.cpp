@@ -622,7 +622,11 @@ Tensor reduce(
         (input_tensor.logical_shape()[-2] % tt::constants::TILE_HEIGHT != 0 ||
          input_tensor.logical_shape()[-1] % tt::constants::TILE_WIDTH != 0)) {
         // fill_pad writes in place. A reduction must not rewrite its caller's tensor.
-        input_tensor = ttnn::clone(input_tensor, std::nullopt, std::nullopt, std::nullopt);
+        // clone cannot be restricted to sub_core_grids: on the full grid it can land in another
+        // sub-device, where nothing orders it against the producer of its input or the reduce.
+        if (!sub_core_grids.has_value()) {
+            input_tensor = ttnn::clone(input_tensor, std::nullopt, std::nullopt, std::nullopt);
+        }
         input_tensor = ttnn::fill_implicit_tile_padding(input_tensor, fill_pad_value);
     }
 
