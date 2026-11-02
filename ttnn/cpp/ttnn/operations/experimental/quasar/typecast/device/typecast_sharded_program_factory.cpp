@@ -8,6 +8,7 @@
 #include <tt-metalium/hal.hpp>
 #include <tt-metalium/host_api.hpp>
 #include <tt-metalium/math.hpp>
+#include <tt-metalium/mesh_buffer.hpp>
 
 namespace ttnn::prim::qsr {
 
@@ -132,8 +133,8 @@ tt::tt_metal::ProgramDescriptor TypecastShardedProgramFactory::create_descriptor
         args.preserve_fp32_precision,
         args.fp32_dest_acc_en);
 
-    auto* src_buffer = &input.mesh_buffer();
-    auto* dst_buffer = &output.mesh_buffer();
+    const auto* src_buffer = &input.mesh_buffer();
+    const auto* dst_buffer = &output.mesh_buffer();
 
     bool src_is_dram = src_buffer->device_local_config().buffer_type == tt::tt_metal::BufferType::DRAM;
     TT_FATAL(src_is_dram == 0, "Input buffer should be in L1");

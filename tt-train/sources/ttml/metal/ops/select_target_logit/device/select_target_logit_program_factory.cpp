@@ -113,19 +113,19 @@ CreatedProgram create_program_for_device(
 
     create_circular_buffer(program, all_cores, kOutputCbIndex, output_data_format, output_tile_bytes, kNumOutputTiles);
 
-    auto* logit_buffer = &logit.mesh_buffer();
+    const auto* logit_buffer = &logit.mesh_buffer();
     TT_FATAL(
         logit_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "select_target_logit: logit buffer must be DRAM, got {}",
         enchantum::to_string(logit_buffer->device_local_config().buffer_type));
 
-    auto* target_buffer = &target.mesh_buffer();
+    const auto* target_buffer = &target.mesh_buffer();
     TT_FATAL(
         target_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "select_target_logit: target buffer must be DRAM, got {}",
         enchantum::to_string(target_buffer->device_local_config().buffer_type));
 
-    auto* output_buffer = &output.mesh_buffer();
+    const auto* output_buffer = &output.mesh_buffer();
     TT_FATAL(
         output_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "select_target_logit: output buffer must be DRAM, got {}",
@@ -240,9 +240,9 @@ void SelectTargetLogitProgramFactory::override_runtime_arguments(
     const operation_attributes_t& operation_attributes,
     const tensor_args_t& tensor_args,
     tensor_return_value_t& tensor_return_value) {
-    auto* logit_buffer = &tensor_args.logit.mesh_buffer();
-    auto* target_buffer = &tensor_args.target.mesh_buffer();
-    auto* output_buffer = &tensor_return_value.mesh_buffer();
+    const auto* logit_buffer = &tensor_args.logit.mesh_buffer();
+    const auto* target_buffer = &tensor_args.target.mesh_buffer();
+    const auto* output_buffer = &tensor_return_value.mesh_buffer();
 
     auto* mesh_device = tensor_args.logit.device();
     const auto mesh_shape = mesh_device->shape();

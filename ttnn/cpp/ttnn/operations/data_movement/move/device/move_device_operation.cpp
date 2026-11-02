@@ -119,8 +119,8 @@ ttnn::prim::MoveDeviceOperation::tensor_return_value_t move(
     using OperationType = ttnn::prim::MoveDeviceOperation;
     bool backwards = false;
     if (move_op_parallelization_strategy == ttnn::prim::MoveOpParallelizationStrategy::MULTI_CORE) {
-        auto* src_buffer = &input_tensor.mesh_buffer();
-        auto* dst_buffer = &output_tensor.mesh_buffer();
+        const auto* src_buffer = &input_tensor.mesh_buffer();
+        const auto* dst_buffer = &output_tensor.mesh_buffer();
         const bool src_and_dst_in_l1 = src_buffer->device_local_config().buffer_type == tt::tt_metal::BufferType::L1 &&
                                        dst_buffer->device_local_config().buffer_type == tt::tt_metal::BufferType::L1;
         const uint32_t src_base = src_buffer->address();

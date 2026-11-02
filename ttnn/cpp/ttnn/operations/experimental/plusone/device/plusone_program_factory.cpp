@@ -49,7 +49,7 @@ ttnn::device_operation::ProgramArtifacts PlusOneProgramFactory::create_program_a
     }
 
     uint32_t num_input_units = W;
-    auto* src_buffer = &input.mesh_buffer();
+    const auto* src_buffer = &input.mesh_buffer();
     bool src_is_dram = src_buffer->device_local_config().buffer_type == tt::tt_metal::BufferType::DRAM;
     const uint32_t page_alignment =
         src_is_dram ? tt::tt_metal::hal::get_dram_alignment() : tt::tt_metal::hal::get_l1_alignment();

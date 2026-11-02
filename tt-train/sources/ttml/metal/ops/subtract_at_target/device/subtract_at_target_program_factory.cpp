@@ -117,19 +117,19 @@ CreatedProgram create_program_for_device(
     create_circular_buffer(
         program, all_cores, kOutputCbIndex, tt::DataFormat::Float16_b, bfloat16_tile_bytes, kNumOutputTiles);
 
-    auto* input_buffer = &input.mesh_buffer();
+    const auto* input_buffer = &input.mesh_buffer();
     TT_FATAL(
         input_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "subtract_at_target: input buffer must be DRAM, got {}",
         enchantum::to_string(input_buffer->device_local_config().buffer_type));
 
-    auto* target_buffer = &target.mesh_buffer();
+    const auto* target_buffer = &target.mesh_buffer();
     TT_FATAL(
         target_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "subtract_at_target: target buffer must be DRAM, got {}",
         enchantum::to_string(target_buffer->device_local_config().buffer_type));
 
-    auto* output_buffer = &output.mesh_buffer();
+    const auto* output_buffer = &output.mesh_buffer();
     TT_FATAL(
         output_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
         "subtract_at_target: output buffer must be DRAM, got {}",
@@ -249,9 +249,9 @@ void SubtractAtTargetProgramFactory::override_runtime_arguments(
     const operation_attributes_t& operation_attributes,
     const tensor_args_t& tensor_args,
     tensor_return_value_t& tensor_return_value) {
-    auto* input_buffer = &tensor_args.input.mesh_buffer();
-    auto* target_buffer = &tensor_args.target.mesh_buffer();
-    auto* output_buffer = &tensor_return_value.mesh_buffer();
+    const auto* input_buffer = &tensor_args.input.mesh_buffer();
+    const auto* target_buffer = &tensor_args.target.mesh_buffer();
+    const auto* output_buffer = &tensor_return_value.mesh_buffer();
 
     auto* mesh_device = tensor_args.input.device();
     const auto mesh_shape = mesh_device->shape();

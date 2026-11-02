@@ -10,6 +10,7 @@
 #include <tt-metalium/host_api.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
+#include <tt-metalium/mesh_buffer.hpp>
 
 #include "ttnn/operations/core/data_movement_kernel/datamovement_kernel_config.hpp"
 #include "ttnn/operations/data_movement/repeat/device/repeat_program_factory_common.hpp"
@@ -46,8 +47,8 @@ ttnn::device_operation::ProgramArtifacts RepeatProgramFactoryLastDim::create_pro
         dest_page_size_bytes == output_log_shape[-1] * data_size,
         "Data size of output does not match requirement for repeat last dim");
     uint32_t read_start_page = 0;
-    auto* src_buffer = &input.mesh_buffer();
-    auto* dst_buffer = &output.mesh_buffer();
+    const auto* src_buffer = &input.mesh_buffer();
+    const auto* dst_buffer = &output.mesh_buffer();
     TT_FATAL(dst_buffer != nullptr, "Output buffer should be allocated on device!");
     // Per-core page count so read/write start on page boundaries.
     const uint32_t number_of_pages = input_log_shape[-2];

@@ -358,9 +358,9 @@ ProgramArtifacts create_no_bcast_artifacts(
     const DataType input_dtype = op.input_dtype;
     const auto op_type = op.binary_op_type;
 
-    auto* a_buffer = &a.mesh_buffer();
+    const auto* a_buffer = &a.mesh_buffer();
     Buffer* b_buffer = is_scalar ? nullptr : b_opt->buffer();
-    auto* c_buffer = &c.mesh_buffer();
+    const auto* c_buffer = &c.mesh_buffer();
     TT_FATAL(
         a_buffer != nullptr && (is_scalar || b_buffer != nullptr) && c_buffer != nullptr,
         "binary_ng Metal 2.0 no-bcast factory requires allocated device buffers");

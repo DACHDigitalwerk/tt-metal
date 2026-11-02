@@ -122,7 +122,7 @@ ValidatorGeometry compute_validator_geometry(const ttnn::Tensor& source_tensor, 
     // WIDTH_SHARDED (one shard per bank) and ND_SHARDED (num_shards = ring_size,
     // receiver-contiguous) layouts. The per-(ring_pos, block) tile mapping is
     // layout-mode-invariant; only the ring_pos -> (bank, recv_idx) formula differs.
-    auto* tensor_buffer = &source_tensor.mesh_buffer();
+    const auto* tensor_buffer = &source_tensor.mesh_buffer();
     const auto& padded_shape = source_tensor.padded_shape();
     TT_FATAL(
         padded_shape.rank() >= 2,
@@ -283,7 +283,7 @@ DramPrefetcherValidatorDeviceOperation::ProgramFactory::create_at(
 
     const ValidatorGeometry geom = compute_validator_geometry(
         source_tensor, bank_plan_from_factory_order_mapping(global_cb.sender_receiver_core_mapping()));
-    auto* tensor_buffer = &source_tensor.mesh_buffer();
+    const auto* tensor_buffer = &source_tensor.mesh_buffer();
     const CoreRangeSet receiver_cores = global_cb.receiver_cores();
 
     Program program = CreateProgram();

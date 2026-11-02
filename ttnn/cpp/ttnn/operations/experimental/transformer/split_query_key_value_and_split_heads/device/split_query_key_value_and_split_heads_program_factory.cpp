@@ -41,7 +41,7 @@ ttnn::device_operation::ProgramArtifacts SplitFusedQKVAndSplitHeadsProgramFactor
     tt::DataFormat data_format = tt_metal::datatype_to_dataformat_converter(a.dtype());
 
     uint32_t single_tile_size = tt::tile_size(data_format);
-    auto* in0_buffer = &a.mesh_buffer();
+    const auto* in0_buffer = &a.mesh_buffer();
     TT_ASSERT(in0_buffer->device_local_size() % single_tile_size == 0);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -83,11 +83,11 @@ ttnn::device_operation::ProgramArtifacts SplitFusedQKVAndSplitHeadsProgramFactor
     ttnn::Tensor& k = output[1];
     ttnn::Tensor& v = output[2];
 
-    auto* q_buffer = &q.mesh_buffer();
+    const auto* q_buffer = &q.mesh_buffer();
     TT_ASSERT(q_buffer != nullptr, "Output q buffer should be allocated on device!");
-    auto* k_buffer = &k.mesh_buffer();
+    const auto* k_buffer = &k.mesh_buffer();
     TT_ASSERT(k_buffer != nullptr, "Output k buffer should be allocated on device!");
-    auto* v_buffer = &v.mesh_buffer();
+    const auto* v_buffer = &v.mesh_buffer();
     TT_ASSERT(v_buffer != nullptr, "Output v buffer should be allocated on device!");
 
     ////////////////////////////////////////////////////////////////////////////

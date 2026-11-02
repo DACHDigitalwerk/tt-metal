@@ -45,7 +45,7 @@ ttnn::device_operation::ProgramArtifacts UntilizeMultiCoreProgramFactory::create
     uint32_t output_single_tile_size = tt::tile_size(output_cb_data_format);
 
     MeshDevice* device = a.device();
-    auto* src0_buffer = &a.mesh_buffer();
+    const auto* src0_buffer = &a.mesh_buffer();
 
     uint32_t tensor_width = a.padded_shape()[-1];
     uint32_t tensor_height = a.physical_volume() / tensor_width;

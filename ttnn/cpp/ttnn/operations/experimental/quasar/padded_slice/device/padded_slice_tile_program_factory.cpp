@@ -377,7 +377,7 @@ PaddedSliceTileProgramFactory::cached_program_t PaddedSliceTileProgramFactory::c
     uint32_t num_tiles_per_channel = input_padded_shape[3] / tt::constants::TILE_WIDTH;
     auto compute_with_storage_grid_size = device->compute_with_storage_grid_size();
 
-    auto* src0_buffer = &a.mesh_buffer();
+    const auto* src0_buffer = &a.mesh_buffer();
 
     TT_FATAL(output.is_sharded(), "Output Tensor must be sharded.");
     auto output_shard_spec = output.shard_spec().value();
@@ -406,7 +406,7 @@ PaddedSliceTileProgramFactory::cached_program_t PaddedSliceTileProgramFactory::c
         tt::div_up(output_shard_spec.shape[0], tt::constants::TILE_HEIGHT);
     uint32_t num_output_sticks_per_core = output_shard_spec.shape[0];
 
-    auto* dst_buffer = &output.mesh_buffer();
+    const auto* dst_buffer = &output.mesh_buffer();
     TT_ASSERT(dst_buffer != nullptr, "Output buffer should be allocated on device!");
 
     TT_FATAL(

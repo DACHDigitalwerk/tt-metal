@@ -12,6 +12,7 @@
 #include <tt-metalium/tile.hpp>
 #include <tt-metalium/math.hpp>
 #include <tt-metalium/work_split.hpp>
+#include <tt-metalium/mesh_buffer.hpp>
 
 #include "ttnn/operations/core/data_movement_kernel/datamovement_kernel_config.hpp"
 #include "ttnn/operations/data_movement/indexed_fill/device/indexed_fill_utils.hpp"
@@ -155,9 +156,9 @@ ttnn::device_operation::ProgramArtifacts IndexedFillProgramFactory::create_progr
 
     const bool is_tile = input_a.layout() == Layout::TILE;
 
-    auto* input_a_buffer = &input_a.mesh_buffer();
-    auto* input_b_buffer = &input_b.mesh_buffer();
-    auto* output_buffer = &output.mesh_buffer();
+    const auto* input_a_buffer = &input_a.mesh_buffer();
+    const auto* input_b_buffer = &input_b.mesh_buffer();
+    const auto* output_buffer = &output.mesh_buffer();
 
     // -----------------------------------------------------------------------------------
     // Path selection

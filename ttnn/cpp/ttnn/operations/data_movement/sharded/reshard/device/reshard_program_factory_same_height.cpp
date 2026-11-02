@@ -71,7 +71,7 @@ ttnn::device_operation::ProgramArtifacts ReshardSameHeightFactory<local_is_outpu
         static_cast<uint32_t>(local_shard_spec.shape[1] * local_tensor.element_size());  // width * element size
     const uint32_t remote_units_per_shard = remote_shard_spec.shape[0];                  // height
 
-    auto* remote_buffer = &remote_tensor.mesh_buffer();
+    const auto* remote_buffer = &remote_tensor.mesh_buffer();
     auto remote_buffer_type = remote_buffer->device_local_config().buffer_type;
 
     // Generate all read/write offsets for each core

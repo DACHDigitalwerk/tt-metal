@@ -52,8 +52,8 @@ ttnn::device_operation::ProgramArtifacts ReshapeViewRMMetalV2ProgramFactory::cre
     const uint32_t dest_page_size_bytes = output_log_shape[-1] * data_size;
     const uint32_t source_read_size_bytes = ((source_page_size_bytes - 1) & MASK_64) + 128;
 
-    auto* src_buffer = &input.mesh_buffer();
-    auto* dst_buffer = &output.mesh_buffer();
+    const auto* src_buffer = &input.mesh_buffer();
+    const auto* dst_buffer = &output.mesh_buffer();
     TT_ASSERT(dst_buffer != nullptr, "Output buffer should be allocated on device!");
     const bool src_is_dram = src_buffer->device_local_config().buffer_type == tt::tt_metal::BufferType::DRAM;
 

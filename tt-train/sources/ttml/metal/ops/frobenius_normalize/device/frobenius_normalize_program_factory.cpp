@@ -108,8 +108,8 @@ FrobeniusNormalizeProgramFactory::cached_program_t FrobeniusNormalizeProgramFact
     // -------------------------------------------------------------------------
     // 4) Create kernels
     // -------------------------------------------------------------------------
-    auto* input_buffer = &input.mesh_buffer();
-    auto* output_buffer = &output[0].mesh_buffer();
+    const auto* input_buffer = &input.mesh_buffer();
+    const auto* output_buffer = &output[0].mesh_buffer();
 
     TT_FATAL(
         input_buffer->device_local_config().buffer_type == ttnn::BufferType::DRAM,
@@ -240,8 +240,8 @@ void FrobeniusNormalizeProgramFactory::override_runtime_arguments(
     auto& shared = cached_program.shared_variables;
     auto& program = cached_program.program;
 
-    auto* input_buffer = &tensor_args.input.mesh_buffer();
-    auto* output_buffer = &output[0].mesh_buffer();
+    const auto* input_buffer = &tensor_args.input.mesh_buffer();
+    const auto* output_buffer = &output[0].mesh_buffer();
 
     auto& reader_rt = GetRuntimeArgs(program, shared.reader_kernel_id);
     auto& reader_origin_rt = GetRuntimeArgs(program, shared.reader_origin_id);

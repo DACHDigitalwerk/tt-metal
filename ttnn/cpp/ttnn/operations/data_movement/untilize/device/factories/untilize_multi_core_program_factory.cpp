@@ -57,7 +57,7 @@ ttnn::device_operation::ProgramArtifacts UntilizeMultiCoreProgramFactory::create
     uint32_t output_single_tile_size = tt::tile_size(output_data_format);
 
     MeshDevice* device = a.device();
-    auto* src0_buffer = &a.mesh_buffer();
+    const auto* src0_buffer = &a.mesh_buffer();
     TT_FATAL(output.is_allocated(), "Output buffer should be allocated on device!");
 
     uint32_t tensor_width = a.padded_shape()[-1];

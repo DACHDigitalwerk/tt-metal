@@ -38,7 +38,7 @@ ttnn::device_operation::ProgramArtifacts NdReshardCopyPagesFactory::create_progr
     const auto& input_mt = input.mesh_tensor();
     const auto& output_mt = output.mesh_tensor();
 
-    auto* input_buffer = &input.mesh_buffer();
+    const auto* input_buffer = &input.mesh_buffer();
 
     auto input_nd_shard_spec = input.memory_config().nd_shard_spec().value();
 

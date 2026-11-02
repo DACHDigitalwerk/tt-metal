@@ -10,6 +10,7 @@
 #include <tt-metalium/host_api.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
+#include <tt-metalium/mesh_buffer.hpp>
 
 #include "ttnn/operations/core/data_movement_kernel/datamovement_kernel_config.hpp"
 #include "ttnn/operations/data_movement/repeat/device/repeat_program_factory_common.hpp"
@@ -62,8 +63,8 @@ ttnn::device_operation::ProgramArtifacts RepeatProgramFactoryHigherDim::create_p
         number_of_lower_pages = input_log_shape[2];
     }
     uint32_t read_start_page = 0;
-    auto* src_buffer = &input.mesh_buffer();
-    auto* dst_buffer = &output.mesh_buffer();
+    const auto* src_buffer = &input.mesh_buffer();
+    const auto* dst_buffer = &output.mesh_buffer();
     TT_FATAL(dst_buffer != nullptr, "Output buffer should be allocated on device!");
     const uint32_t cb_size_bytes = (READ_ALIGNMENT * 2) + page_size_bytes;
 
