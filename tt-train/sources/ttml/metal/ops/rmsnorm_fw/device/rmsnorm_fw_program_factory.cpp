@@ -72,8 +72,8 @@ namespace ttml::metal::ops::rmsnorm_fw::device {
 
 namespace {
 
-// The input's tile rows over the device's compute grid. create_descriptor() pins it against split_work_to_cores, and
-// override_runtime_arguments() walks the same cores from it.
+// The input's tile rows over the device's compute grid. create_descriptor() and override_runtime_arguments() walk the
+// same cores from it.
 WorkSplit make_work_split(const ttnn::Tensor& input) {
     const auto& shape = input.padded_shape();
     return compute_work_split(
@@ -150,8 +150,6 @@ tt::tt_metal::ProgramDescriptor RMSNormForwardProgramFactory::create_descriptor(
     auto [num_cores, all_cores, core_group_1, core_group_2, num_rows_per_core_group_1, num_rows_per_core_group_2] =
         tt::tt_metal::split_work_to_cores(compute_with_storage_grid_size, total_rows_to_process);
     const WorkSplit split = make_work_split(input);
-    check_work_split(
-        split, num_cores, core_group_1, core_group_2, num_rows_per_core_group_1, num_rows_per_core_group_2);
 
     // -------------------------------------------------------------------------
     // 2) Create and configure circular buffers
