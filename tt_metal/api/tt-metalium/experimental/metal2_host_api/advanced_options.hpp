@@ -23,7 +23,7 @@ namespace tt::tt_metal::experimental {
 class PrefetcherPipe;
 }  // namespace tt::tt_metal::experimental
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 // Advanced options for Metal 2.0 specs
@@ -186,7 +186,7 @@ struct KernelAdvancedOptions {
     struct PrefetcherPipeBinding {
         // PrefetcherPipeParameters (within the ProgramSpec) reachable through this accessor.
         // Non-empty. Typically one; several when they tile the kernel's nodes (see above).
-        Group<PrefetcherPipeParamName> pipe_parameter_names;
+        Group<experimental::PrefetcherPipeParamName> pipe_parameter_names;
         std::string accessor_name;  // pipe accessor name (used in the kernel source code)
 
         // Nodes the kernel runs on that are not a sender or receiver of any pipe in the group,
@@ -297,7 +297,7 @@ struct DFBAdvancedOptions {
     //
     // CAUTION: The relay's storage is the pipe's ring, owned outside the Program. The DFB cannot
     //          be resized by DFBRunOverrides, and its address is only known once the pipe is bound.
-    Group<PrefetcherPipeParamName> prefetcher_pipe_relays;
+    Group<experimental::PrefetcherPipeParamName> prefetcher_pipe_relays;
 };
 
 struct ScratchpadAdvancedOptions {
@@ -333,7 +333,7 @@ struct ProgramAdvancedOptions {
     // Program's kernels take part in. The actual PrefetcherPipe objects are supplied via
     // AdvancedProgramRunArgs::prefetcher_pipe_args. A kernel's sender/receiver role is derived
     // from its WorkUnitSpec node coverage; see prefetcher_pipe_parameter.hpp.
-    Group<PrefetcherPipeParameter> prefetcher_pipe_parameters;
+    Group<experimental::PrefetcherPipeParameter> prefetcher_pipe_parameters;
 };
 
 struct AdvancedKernelRunArgs {
@@ -387,7 +387,7 @@ struct AdvancedProgramRunArgs {
     //
     // CAUTION: PrefetcherPipe is an RAII object owning durable L1. The user is responsible for keeping
     //          it alive until the last Program execution that uses it has completed on the device.
-    Table<PrefetcherPipeParamName, PrefetcherPipeArgument> prefetcher_pipe_args;
+    Table<experimental::PrefetcherPipeParamName, PrefetcherPipeArgument> prefetcher_pipe_args;
 };
 
 struct SemaphoreAdvancedOptions {
@@ -428,4 +428,4 @@ struct SemaphoreAdvancedOptions {
 using PrefetcherPipeBinding = KernelAdvancedOptions::PrefetcherPipeBinding;
 using PrefetcherPipeArgument = AdvancedProgramRunArgs::PrefetcherPipeArgument;
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

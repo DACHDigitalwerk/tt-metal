@@ -23,7 +23,7 @@
 #include <tt-metalium/experimental/metal2_host_api/utility/table.hpp>
 #include <tt-metalium/tensor/mesh_tensor.hpp>
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 //  ProgramRunArgs API
@@ -239,4 +239,4 @@ inline KernelRunArgs::RuntimeArgValues MakeRuntimeArgsForSingleNode(
     return runtime_arg_values;
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

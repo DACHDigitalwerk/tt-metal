@@ -25,7 +25,7 @@
 #include <tt_stl/strong_type.hpp>
 #include <tt-metalium/kernel_types.hpp>
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 //  KernelSpec API
@@ -344,4 +344,4 @@ inline DFBBinding BlockedConsumerOf(DFBSpecName dfb_spec_name, std::string acces
     };
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

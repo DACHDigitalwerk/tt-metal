@@ -13,7 +13,7 @@
 #include <tt-metalium/tt_backend_api_types.hpp>
 #include <tt_stl/strong_type.hpp>
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 //  ScratchpadSpec API
@@ -86,4 +86,4 @@ struct ScratchpadSpec {
     ScratchpadAdvancedOptions advanced_options;
 };
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

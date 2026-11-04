@@ -10,7 +10,7 @@
 #include <tt-metalium/experimental/metal2_host_api/utility/table.hpp>
 #include <tt-metalium/base_types.hpp>  // For MathFidelity, UnpackToDestMode
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 //  ComputeHardwareConfig
@@ -145,4 +145,4 @@ struct ComputeHardwareConfig {
     std::optional<Compute2XXConfig> config_2xx = std::nullopt;
 };
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

@@ -11,7 +11,7 @@
 #include <tt-metalium/experimental/metal2_host_api/utility/group.hpp>
 #include <tt-metalium/kernel_types.hpp>  // For DataMovementProcessor, NOC, etc.
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // Whether a dedicated-NOC data movement kernel may share its NOC with the other data movement kernel on
 // its nodes. See DataMovementHardwareConfig::DataMovement1XXConfig::dedicated_noc_sharing.
@@ -154,4 +154,4 @@ inline DataMovementHardwareConfig CreateWriterDataMovementConfig() noexcept {
     };
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

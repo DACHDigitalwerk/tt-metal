@@ -62,7 +62,7 @@
 //
 // ============================================================================
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // Name identifying a DataflowBufferSpec within a ProgramSpec.
 using DFBSpecName = ttsl::StrongType<std::string, struct DFBSpecNameTag>;
@@ -119,4 +119,4 @@ struct DataflowBufferSpec {
     DFBAdvancedOptions advanced_options;
 };
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal
