@@ -55,7 +55,9 @@ _PERF_MARGIN = 0.03
 # through device synchronization.
 _PERF_REFERENCE_MS = {
     _LOUDBOX_PERF_SKU: {
-        "SP8xTP1": 1.30,
+        # Kimi-K3 HiFi3 (scan, affine prefix, output projection): 1.30 x 1.0346, the traced HiFi3 / HiFi2 ratio over
+        # 3 interleaved rounds on bh-lb-18.
+        "SP8xTP1": 1.345,
         "TP4-linear": 0.188,
     },
     _QUIETBOX_PERF_SKU: {
@@ -70,7 +72,9 @@ _PERF_REFERENCE_MS = {
 _DEVICE_PERF_MARGIN = 0.05
 _DEVICE_PERF_REFERENCE_MS = {
     _QUIETBOX_PERF_SKU: {
-        "SP4xTP1": 1.24,
+        # Kimi-K3 HiFi3: 1.24 x 1.0346, assuming LoudBox SP8xTP1's measured ratio (same per-chip workload); not
+        # measured on QuietBox.
+        "SP4xTP1": 1.283,
     },
 }
 # Galaxy-equivalent layouts outside CI: they report wall time but are not gated.
