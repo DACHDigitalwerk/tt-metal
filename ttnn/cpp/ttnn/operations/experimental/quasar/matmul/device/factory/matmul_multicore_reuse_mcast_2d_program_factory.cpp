@@ -4496,7 +4496,7 @@ ttnn::device_operation::ProgramArtifacts create_program_mcast_in0_in1_artifacts(
 
         // in0 sender / receiver
         if (in0_block_sharded) {
-            m2::AdvancedKernelRunArgs::Varargs v;
+            m2::experimental::AdvancedKernelRunArgs::Varargs v;
             uint32_t in0_mcast_receiver_grid_same_coord;
             m2::Table<std::string, uint32_t> leading;
             if (transpose_mcast) {

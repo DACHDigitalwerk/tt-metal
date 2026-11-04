@@ -803,7 +803,7 @@ public:
         using TensorParamName = tt::tt_metal::TensorParamName;
         using TensorArgument = tt::tt_metal::ProgramRunArgs::TensorArgument;
         using PrefetcherPipeParamName = tt::tt_metal::experimental::PrefetcherPipeParamName;
-        using PrefetcherPipeArgument = tt::tt_metal::PrefetcherPipeArgument;
+        using PrefetcherPipeArgument = tt::tt_metal::experimental::PrefetcherPipeArgument;
 
         // Stored across cache entries: for each TensorArgument in a program's ProgramRunArgs, which
         // tensor (by index into the deterministic enumeration of io tensors followed by op-owned

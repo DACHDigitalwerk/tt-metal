@@ -29,7 +29,6 @@ using ttnn::operations::unary::UnaryOpType;
 using ttnn::operations::unary::UnaryWithParam;
 
 using tt::tt_metal::AddRuntimeArgsForNode;
-using tt::tt_metal::AdvancedKernelRunArgs;
 using tt::tt_metal::ComputeHardwareConfig;
 using tt::tt_metal::DataflowBufferSpec;
 using tt::tt_metal::DataMovementHardwareConfig;
@@ -54,6 +53,7 @@ using tt::tt_metal::TensorParameter;
 using tt::tt_metal::TensorParamName;
 using tt::tt_metal::UnpackMode;
 using tt::tt_metal::WorkUnitSpec;
+using tt::tt_metal::experimental::AdvancedKernelRunArgs;
 
 namespace ttnn::prim {
 namespace reuse_dram_sharded_optimized_helpers {

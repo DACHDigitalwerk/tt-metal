@@ -351,7 +351,8 @@ static void populate_reader_runtime_args(
                         {"is_sender_core", (uint32_t)is_sender_core},
                         {"dram_config_reader_index", transpose_mcast ? core.x : core.y},
                     });
-                m2::AdvancedKernelRunArgs::Varargs varargs(act_mcast_noc_y.begin(), act_mcast_noc_y.end());
+                m2::experimental::AdvancedKernelRunArgs::Varargs varargs(
+                    act_mcast_noc_y.begin(), act_mcast_noc_y.end());
                 reader_run_args.advanced_options.runtime_varargs.insert({core, std::move(varargs)});
             }
         }

@@ -1264,7 +1264,8 @@ inline ProgramRunArgs MakeMinimalRunArgs(const NodeCoord& node) {
     auto kernel_args = [&](const char* name) {
         return ProgramRunArgs::KernelRunArgs{
             .kernel = KernelSpecName{name},
-            .advanced_options = AdvancedKernelRunArgs{.runtime_varargs = {{node, {}}}, .common_runtime_varargs = {}},
+            .advanced_options =
+                experimental::AdvancedKernelRunArgs{.runtime_varargs = {{node, {}}}, .common_runtime_varargs = {}},
         };
     };
     ProgramRunArgs params;

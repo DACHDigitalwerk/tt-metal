@@ -272,11 +272,11 @@ m2::ProgramRunArgs loopback_run_args(const MeshTensor& input, const MeshTensor& 
     args.kernel_run_args = {
         m2::ProgramRunArgs::KernelRunArgs{
             .kernel = m2::KernelSpecName{"producer"},
-            .advanced_options = m2::AdvancedKernelRunArgs{.runtime_varargs = {{kNode, {num_pages}}}},
+            .advanced_options = AdvancedKernelRunArgs{.runtime_varargs = {{kNode, {num_pages}}}},
         },
         m2::ProgramRunArgs::KernelRunArgs{
             .kernel = m2::KernelSpecName{"consumer"},
-            .advanced_options = m2::AdvancedKernelRunArgs{.runtime_varargs = {{kNode, {num_pages}}}},
+            .advanced_options = AdvancedKernelRunArgs{.runtime_varargs = {{kNode, {num_pages}}}},
         },
     };
     args.tensor_args = {

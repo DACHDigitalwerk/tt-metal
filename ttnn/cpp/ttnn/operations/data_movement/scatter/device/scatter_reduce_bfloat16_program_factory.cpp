@@ -16,6 +16,7 @@
 namespace ttnn::prim {
 
 using namespace tt::tt_metal;
+using tt::tt_metal::experimental::AdvancedKernelRunArgs;
 
 ttnn::device_operation::ProgramArtifacts ScatterReduceBfloat16ProgramFactory::create_program_artifacts(
     const ScatterParams& args, const ScatterInputs& tensor_args, Tensor& output_tensor) {

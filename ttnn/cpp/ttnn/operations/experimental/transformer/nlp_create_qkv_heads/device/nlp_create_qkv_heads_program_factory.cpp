@@ -18,6 +18,7 @@ namespace ttnn::operations::experimental::transformer {
 using namespace tt::constants;
 using namespace tt;
 using namespace tt::tt_metal;
+using tt::tt_metal::experimental::AdvancedKernelRunArgs;
 
 namespace {
 

@@ -112,7 +112,7 @@ struct ProgramRunArgs {
         // Advanced options (see advanced_options.hpp).
         // Companion to KernelAdvancedOptions on the schema side; holds
         // positional vararg values.
-        AdvancedKernelRunArgs advanced_options;
+        experimental::AdvancedKernelRunArgs advanced_options;
     };
     // For SetProgramRunArgs, a KernelRunArgs must be specified for ALL kernels in the ProgramSpec
     //  (except for kernels that have no runtime or common runtime arguments, scalar or array).
@@ -165,7 +165,7 @@ struct ProgramRunArgs {
     ////////////////////////////////////////////////////////////////////////
     // Companion to ProgramAdvancedOptions on the schema side; holds the
     // experimental PrefetcherPipe arguments.
-    AdvancedProgramRunArgs advanced_options;
+    experimental::AdvancedProgramRunArgs advanced_options;
 };
 
 //-----------------------------------------------------

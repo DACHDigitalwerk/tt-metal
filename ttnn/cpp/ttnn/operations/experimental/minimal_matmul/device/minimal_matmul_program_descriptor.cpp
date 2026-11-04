@@ -41,7 +41,6 @@ using tt::tt_metal::DFBBinding;
 using tt::tt_metal::DFBEndpointType;
 using tt::tt_metal::DFBSpecName;
 using tt::tt_metal::Group;
-using tt::tt_metal::KernelAdvancedOptions;
 using tt::tt_metal::KernelSpec;
 using tt::tt_metal::KernelSpecName;
 using tt::tt_metal::ProgramRunArgs;
@@ -53,6 +52,7 @@ using tt::tt_metal::TensorBinding;
 using tt::tt_metal::TensorParameter;
 using tt::tt_metal::TensorParamName;
 using tt::tt_metal::WorkUnitSpec;
+using tt::tt_metal::experimental::KernelAdvancedOptions;
 
 namespace {
 

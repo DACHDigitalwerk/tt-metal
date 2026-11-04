@@ -248,7 +248,7 @@ struct KernelSpec {
     //////////////////////////////////////////////////////////////////////////////
     // Advanced options (see advanced_options.hpp)
     //////////////////////////////////////////////////////////////////////////////
-    KernelAdvancedOptions advanced_options;
+    experimental::KernelAdvancedOptions advanced_options;
 };
 
 //------------------------------------------------

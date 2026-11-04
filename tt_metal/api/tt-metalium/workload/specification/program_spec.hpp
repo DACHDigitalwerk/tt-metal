@@ -96,7 +96,7 @@ struct ProgramSpec {
 
     // Advanced options (see advanced_options.hpp)
     // Experimental PrefetcherPipe parameter declarations live here.
-    ProgramAdvancedOptions advanced_options;
+    experimental::ProgramAdvancedOptions advanced_options;
 };
 
 }  // namespace tt::tt_metal

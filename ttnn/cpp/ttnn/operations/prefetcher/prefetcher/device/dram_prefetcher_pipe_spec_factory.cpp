@@ -33,12 +33,12 @@ using tt::tt_metal::Group;
 using tt::tt_metal::KernelRunArgs;
 using tt::tt_metal::KernelSpec;
 using tt::tt_metal::KernelSpecName;
-using tt::tt_metal::PrefetcherPipeArgument;
 using tt::tt_metal::ProgramRunArgs;
 using tt::tt_metal::ProgramSpec;
 using tt::tt_metal::TensorParameter;
 using tt::tt_metal::TensorParamName;
 using tt::tt_metal::WorkUnitSpec;
+using tt::tt_metal::experimental::PrefetcherPipeArgument;
 using tt::tt_metal::experimental::PrefetcherPipeParameter;
 using tt::tt_metal::experimental::PrefetcherPipeParamName;
 

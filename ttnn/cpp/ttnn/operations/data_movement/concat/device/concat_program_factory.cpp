@@ -25,6 +25,8 @@ ttnn::device_operation::ProgramArtifacts ConcatProgramFactory::create_program_ar
     const ConcatParams& operation_attributes, const ConcatInputs& tensor_args, Tensor& tensor_return_value) {
     using namespace tt::constants;
     using namespace tt::tt_metal;
+    using tt::tt_metal::experimental::AdvancedKernelRunArgs;
+    using tt::tt_metal::experimental::KernelAdvancedOptions;
 
     const uint32_t dim = operation_attributes.dim;
     const auto& sub_core_grids = operation_attributes.sub_core_grids;

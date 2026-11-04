@@ -412,7 +412,8 @@ tt::tt_metal::distributed::MeshWorkload make_tensor_prefetcher_pipe_validator_wo
              .receivers = prefetcher_pipes[i]->receiver_cores(),
              .ring_size = prefetcher_pipes[i]->ring_size(),
              .entry_size = geom.page_bytes_per_recv});
-        run_args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{*prefetcher_pipes[i]});
+        run_args.advanced_options.prefetcher_pipe_args.emplace(
+            name, metal_exp::PrefetcherPipeArgument{*prefetcher_pipes[i]});
     }
     const TensorParamName source_name{"source_tensor"};
     const ScratchpadSpecName scratch_name{"expected"};

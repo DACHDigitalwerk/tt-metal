@@ -97,12 +97,13 @@ inline experimental::PrefetcherPipeParameter MakePipeParameter() {
     };
 }
 
-inline PrefetcherPipeBinding BindPipes(
+inline experimental::PrefetcherPipeBinding BindPipes(
     std::vector<experimental::PrefetcherPipeParamName> pipes, std::string accessor = "weights") {
-    return PrefetcherPipeBinding{.pipe_parameter_names = std::move(pipes), .accessor_name = std::move(accessor)};
+    return experimental::PrefetcherPipeBinding{
+        .pipe_parameter_names = std::move(pipes), .accessor_name = std::move(accessor)};
 }
 
-inline PrefetcherPipeBinding BindPipe(std::string accessor = "weights") {
+inline experimental::PrefetcherPipeBinding BindPipe(std::string accessor = "weights") {
     return BindPipes({pipe_param_name}, std::move(accessor));
 }
 

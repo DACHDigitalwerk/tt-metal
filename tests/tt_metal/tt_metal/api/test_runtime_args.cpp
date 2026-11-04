@@ -146,7 +146,7 @@ distributed::MeshWorkload initialize_program_data_movement_rta(
         .compiler_options = {.defines = dm_defines},
         .hw_config = dm_cfg,
         .advanced_options =
-            KernelAdvancedOptions{
+            tt_metal::experimental::KernelAdvancedOptions{
                 .num_runtime_varargs = common_rtas ? 0u : num_unique_rt_args,
                 .num_common_runtime_varargs = common_rtas ? num_unique_rt_args : 0u,
             },
@@ -238,7 +238,7 @@ std::pair<distributed::MeshWorkload, std::vector<std::string>> initialize_progra
             .compiler_options = {.defines = defines_vec},
             .hw_config = DataMovementHardwareConfig{},
             .advanced_options =
-                KernelAdvancedOptions{
+                tt_metal::experimental::KernelAdvancedOptions{
                     .num_runtime_varargs = num_runtime_args,
                     .num_common_runtime_varargs = common_rtas ? static_cast<size_t>(num_runtime_args) : size_t{0},
                 },
@@ -1058,7 +1058,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarCRTASharedL1Address) {
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = KernelSpecName{kernel_names[0]},
         .advanced_options =
-            AdvancedKernelRunArgs{
+            experimental::AdvancedKernelRunArgs{
                 .runtime_varargs = {{core, std::vector<uint32_t>(common_rtas.size(), 0)}},
                 .common_runtime_varargs = common_rtas,
             },
@@ -1100,7 +1100,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarCRTAUniqueL1Addresses) {
         params.kernel_run_args.push_back(ProgramRunArgs::KernelRunArgs{
             .kernel = KernelSpecName{kernel_names[i]},
             .advanced_options =
-                AdvancedKernelRunArgs{
+                experimental::AdvancedKernelRunArgs{
                     .runtime_varargs = {{core, std::vector<uint32_t>(base_crtas.size(), 0)}},
                     .common_runtime_varargs = kernel_crtas,
                 },

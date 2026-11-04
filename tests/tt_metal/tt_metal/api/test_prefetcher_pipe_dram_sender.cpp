@@ -205,7 +205,8 @@ void run_push_and_pop(
             .receivers = set.pipes[s].receiver_cores(),
             .ring_size = set.pipes[s].ring_size(),
             .entry_size = entry_size});
-        run_args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{set.pipes[s]});
+        run_args.advanced_options.prefetcher_pipe_args.emplace(
+            name, experimental::PrefetcherPipeArgument{set.pipes[s]});
     }
     KernelSpec receiver{.unique_id = KernelSpecName{"receiver"}, .source = std::filesystem::path{kReceiverKernel}};
     receiver.advanced_options.prefetcher_pipe_bindings = {{.pipe_parameter_names = pipe_names, .accessor_name = "in"}};
@@ -652,7 +653,7 @@ TEST_F(PrefetcherPipeDramSenderFixture, BindingAcceptsAnyEntrySizeTheRingHolds) 
                      .entry_size = entry_size}}}};
         Program program = experimental::MakeProgramFromSpec(*mesh_device_, spec);
         ProgramRunArgs args;
-        args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{set.pipes[0]});
+        args.advanced_options.prefetcher_pipe_args.emplace(name, experimental::PrefetcherPipeArgument{set.pipes[0]});
         experimental::SetProgramRunArgs(program, args);
     };
     // L1-aligned and well inside the ring, so only a divisibility rule could have rejected it.

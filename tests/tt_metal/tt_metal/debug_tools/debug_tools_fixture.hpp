@@ -532,7 +532,8 @@ private:
                 .source = std::filesystem::path{kernel_path},
                 .num_threads = 1,
                 .hw_config = SingleThreadDmConfig(arch),
-                .advanced_options = KernelAdvancedOptions{.num_runtime_varargs = static_cast<uint32_t>(num_args)},
+                .advanced_options =
+                    experimental::KernelAdvancedOptions{.num_runtime_varargs = static_cast<uint32_t>(num_args)},
             }},
             .work_units = {WorkUnitSpec{.name = "main", .kernels = {kPrintKernelName}, .target_nodes = kPrintNode}},
         };

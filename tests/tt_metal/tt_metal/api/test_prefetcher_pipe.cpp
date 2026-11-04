@@ -198,7 +198,7 @@ void bind_pipe(
     std::vector<experimental::PrefetcherPipeParamName> pipes,
     const std::string& accessor,
     const CoreRangeSet& extra_nodes = {}) {
-    kernel.advanced_options.prefetcher_pipe_bindings.push_back(m2::PrefetcherPipeBinding{
+    kernel.advanced_options.prefetcher_pipe_bindings.push_back(experimental::PrefetcherPipeBinding{
         .pipe_parameter_names = std::move(pipes), .accessor_name = accessor, .extra_nodes = extra_nodes});
 }
 
@@ -257,7 +257,7 @@ m2::ProgramRunArgs pipe_run_args(
     experimental::PrefetcherPipe& pipe, std::vector<m2::ProgramRunArgs::KernelRunArgs> kernels = {}) {
     m2::ProgramRunArgs args;
     args.kernel_run_args = std::move(kernels);
-    args.advanced_options.prefetcher_pipe_args.emplace(pipe_param, m2::PrefetcherPipeArgument{pipe});
+    args.advanced_options.prefetcher_pipe_args.emplace(pipe_param, experimental::PrefetcherPipeArgument{pipe});
     return args;
 }
 
@@ -1351,7 +1351,7 @@ TEST_F(PrefetcherPipeFixture, ProgramSpec_AssignsDistinctSlotsPerAccessor) {
 
     m2::ProgramRunArgs args;
     args.advanced_options.prefetcher_pipe_args = {
-        {name0, m2::PrefetcherPipeArgument{pipe0}}, {name1, m2::PrefetcherPipeArgument{pipe1}}};
+        {name0, experimental::PrefetcherPipeArgument{pipe0}}, {name1, experimental::PrefetcherPipeArgument{pipe1}}};
     experimental::SetProgramRunArgs(program, args);
     EXPECT_EQ(per_core.at(CoreCoord(0, 0))[0].pipe_identity, pipe0.identity());
     EXPECT_EQ(per_core.at(CoreCoord(0, 1))[0].pipe_identity, pipe1.identity());
@@ -2882,7 +2882,7 @@ constexpr const char* sender_or_idle_kernel_path =
     "tests/tt_metal/tt_metal/test_kernels/dataflow/prefetcher_pipe_sender_or_idle.cpp";
 
 void expect_receivers_got_every_entry(
-    distributed::MeshDevice& device, m2::PrefetcherPipe& pipe, uint32_t entry_size, uint32_t num_entries) {
+    distributed::MeshDevice& device, experimental::PrefetcherPipe& pipe, uint32_t entry_size, uint32_t num_entries) {
     const auto receivers = corerange_to_cores(pipe.receiver_cores());
     const auto num_receivers = static_cast<uint32_t>(receivers.size());
     for (uint32_t ri = 0; ri < num_receivers; ++ri) {
@@ -2925,13 +2925,13 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipe_ReceiverKernelOnExtraNodes) {
         .work_units = {work_unit("receiver_wu", {"receiver"}, CoreRangeSet(kernel_cores))},
         .advanced_options = {.prefetcher_pipe_parameters = {pipe_parameter(pipe_param, pipe, entry_size)}},
     };
-    Program receiver_program = m2::MakeProgramFromSpec(device, spec);
+    Program receiver_program = experimental::MakeProgramFromSpec(device, spec);
     m2::ProgramRunArgs::KernelRunArgs receiver_args{.kernel = m2::KernelSpecName{"receiver"}};
     for (const CoreCoord& core : corerange_to_cores(CoreRangeSet(kernel_cores))) {
         m2::AddRuntimeArgsForNode(
             receiver_args.runtime_arg_values, core, {{"is_receiver", receiver_cores.contains(core) ? 1u : 0u}});
     }
-    m2::SetProgramRunArgs(receiver_program, pipe_run_args(pipe, {receiver_args}));
+    experimental::SetProgramRunArgs(receiver_program, pipe_run_args(pipe, {receiver_args}));
     prefetcher_pipe_test::expect_one_multicast_rectangle(receiver_program, kernel_cores);
 
     persistent_run_overlapping_programs(mesh_device, std::move(sender_program), std::move(receiver_program));
@@ -2964,7 +2964,7 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipe_SenderKernelOnExtraNode) {
         .work_units = {work_unit("sender_wu", {"sender"}, CoreRangeSet(kernel_cores))},
         .advanced_options = {.prefetcher_pipe_parameters = {pipe_parameter(pipe_param, pipe, entry_size)}},
     };
-    Program sender_program = m2::MakeProgramFromSpec(device, spec);
+    Program sender_program = experimental::MakeProgramFromSpec(device, spec);
     prefetcher_pipe_test::write_sender_l1_staging(
         device, pipe.sender_cores(), pipe, /*data_pattern=*/0, entry_size, num_entries, receiver_cores.num_cores());
     m2::ProgramRunArgs::KernelRunArgs sender_args{.kernel = m2::KernelSpecName{"sender"}};
@@ -2975,7 +2975,7 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipe_SenderKernelOnExtraNode) {
             {{"is_sender", core == sender_core ? 1u : 0u},
              {"staging_addr", prefetcher_pipe_test::sender_l1_staging_address(pipe)}});
     }
-    m2::SetProgramRunArgs(sender_program, pipe_run_args(pipe, {sender_args}));
+    experimental::SetProgramRunArgs(sender_program, pipe_run_args(pipe, {sender_args}));
     prefetcher_pipe_test::expect_one_multicast_rectangle(sender_program, kernel_cores);
 
     Program receiver_program = make_receiver_program(device, pipe, entry_size, num_entries);
@@ -3327,7 +3327,8 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipe_MultiPipeAccessor_CrossProgram_2S2R
         m2::ProgramRunArgs args;
         args.kernel_run_args = std::move(kernels);
         args.advanced_options.prefetcher_pipe_args = {
-            {name_a, m2::PrefetcherPipeArgument{pipe_a}}, {name_b, m2::PrefetcherPipeArgument{pipe_b}}};
+            {name_a, experimental::PrefetcherPipeArgument{pipe_a}},
+            {name_b, experimental::PrefetcherPipeArgument{pipe_b}}};
         return args;
     };
 

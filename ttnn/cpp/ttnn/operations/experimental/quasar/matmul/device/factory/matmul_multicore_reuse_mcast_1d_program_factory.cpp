@@ -6321,7 +6321,7 @@ ttnn::device_operation::ProgramArtifacts create_program_mcast_in0_artifacts(
         uint32_t output_idx_y = i / num_blocks_x;
 
         if (in0_is_sharded) {
-            m2::AdvancedKernelRunArgs::Varargs v;
+            m2::experimental::AdvancedKernelRunArgs::Varargs v;
             v.reserve(in0_sharded_num_varargs);
             for (auto x : in0_mcast_noc_x) {
                 v.push_back(x);

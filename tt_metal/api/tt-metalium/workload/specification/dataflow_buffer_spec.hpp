@@ -116,7 +116,7 @@ struct DataflowBufferSpec {
     //////////////////////////////
     // Advanced options (see advanced_options.hpp)
     //////////////////////////////
-    DFBAdvancedOptions advanced_options;
+    experimental::DFBAdvancedOptions advanced_options;
 };
 
 }  // namespace tt::tt_metal

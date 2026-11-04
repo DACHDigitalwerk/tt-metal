@@ -50,7 +50,7 @@ int main() {
                         },
                 },
             // With no named args, vararg i is get_arg_val<uint32_t>(i), so the kernel reads its args unchanged
-            .advanced_options = KernelAdvancedOptions{.num_runtime_varargs = 6},
+            .advanced_options = tt::tt_metal::experimental::KernelAdvancedOptions{.num_runtime_varargs = 6},
         };
 
         WorkUnitSpec wu{
@@ -90,7 +90,7 @@ int main() {
         params.kernel_run_args.push_back(ProgramRunArgs::KernelRunArgs{
             .kernel = DRAM_COPY_KERNEL,
             .advanced_options =
-                AdvancedKernelRunArgs{
+                tt::tt_metal::experimental::AdvancedKernelRunArgs{
                     .runtime_varargs =
                         {{node,
                           {static_cast<uint32_t>(l1_buffer->address()),

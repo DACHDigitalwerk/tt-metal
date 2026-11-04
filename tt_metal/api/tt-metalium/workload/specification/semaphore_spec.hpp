@@ -44,7 +44,7 @@ struct SemaphoreSpec {
     //////////////////////////////////////////////////////////////////////////////
     // Advanced options (see advanced_options.hpp)
     //////////////////////////////////////////////////////////////////////////////
-    SemaphoreAdvancedOptions advanced_options;
+    experimental::SemaphoreAdvancedOptions advanced_options;
 };
 
 }  // namespace tt::tt_metal

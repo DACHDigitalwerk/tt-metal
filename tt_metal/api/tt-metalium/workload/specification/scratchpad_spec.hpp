@@ -83,7 +83,7 @@ struct ScratchpadSpec {
     ////////////////////////////////////
     // Advanced options (see advanced_options.hpp)
     ////////////////////////////////////
-    ScratchpadAdvancedOptions advanced_options;
+    experimental::ScratchpadAdvancedOptions advanced_options;
 };
 
 }  // namespace tt::tt_metal

@@ -149,14 +149,14 @@ AliasDFBProgramComponents make_alias_dfb_program_spec(
         .entry_size = entry_size_a,
         .num_entries = num_entries_a,
         .data_format_metadata = tt::DataFormat::Float16_b,
-        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_b"}}},
+        .advanced_options = experimental::DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_b"}}},
     };
     DataflowBufferSpec dfb_b{
         .unique_id = DFBSpecName{"dfb_b"},
         .entry_size = entry_size_b,
         .num_entries = num_entries_b,
         .data_format_metadata = tt::DataFormat::Float16_b,
-        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_a"}}},
+        .advanced_options = experimental::DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_a"}}},
     };
 
     KernelSpec producer{
@@ -375,7 +375,7 @@ AliasBorrowedDFBComponents make_alias_borrowed_dfb_program_spec(
         .num_entries = num_entries,
         .data_format_metadata = tt::DataFormat::Float16_b,
         .borrowed_from = TensorParamName{"ring_tensor"},
-        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_alias"}}},
+        .advanced_options = experimental::DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_alias"}}},
     };
     DataflowBufferSpec dfb_alias_spec{
         .unique_id = DFBSpecName{"dfb_alias"},
@@ -383,7 +383,7 @@ AliasBorrowedDFBComponents make_alias_borrowed_dfb_program_spec(
         .num_entries = num_entries,
         .data_format_metadata = tt::DataFormat::Float16_b,
         .borrowed_from = TensorParamName{"ring_tensor"},
-        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_borrowed"}}},
+        .advanced_options = experimental::DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_borrowed"}}},
     };
 
     KernelSpec producer{
@@ -532,7 +532,7 @@ TEST_F(UnitMeshFixture, AliasDFBDisjointHalvesDataFlow) {
     // Rename right-half entities so the combined ProgramSpec has unique ids.
     auto rename_dfb = [](DataflowBufferSpec& dfb, const std::string& new_name, const std::string& alias_name) {
         dfb.unique_id = DFBSpecName{new_name};
-        dfb.advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{alias_name}}};
+        dfb.advanced_options = experimental::DFBAdvancedOptions{.alias_with = {DFBSpecName{alias_name}}};
     };
     auto rename_kernel = [](KernelSpec& k,
                             const std::string& new_name,

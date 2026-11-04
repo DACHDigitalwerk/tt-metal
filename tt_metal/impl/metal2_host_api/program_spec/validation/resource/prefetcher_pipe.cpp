@@ -354,7 +354,7 @@ void ValidatePrefetcherPipeLanesAndRelays(
             const bool binds_relayed_set = std::any_of(
                 rec.kernel->advanced_options.prefetcher_pipe_bindings.begin(),
                 rec.kernel->advanced_options.prefetcher_pipe_bindings.end(),
-                [&](const KernelAdvancedOptions::PrefetcherPipeBinding& binding) {
+                [&](const experimental::KernelAdvancedOptions::PrefetcherPipeBinding& binding) {
                     return binding.pipe_parameter_names.size() == relayed_set.size() &&
                            std::all_of(
                                binding.pipe_parameter_names.begin(),

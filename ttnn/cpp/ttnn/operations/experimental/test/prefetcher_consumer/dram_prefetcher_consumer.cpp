@@ -118,7 +118,7 @@ DramPrefetcherConsumerDeviceOperation::ProgramFactory::create_at(
                  .receivers = pipes[i]->receiver_cores(),
                  .ring_size = pipes[i]->ring_size(),
                  .entry_size = operation_attributes.page_size_bytes});
-            run_args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{*pipes[i]});
+            run_args.advanced_options.prefetcher_pipe_args.emplace(name, metal_exp::PrefetcherPipeArgument{*pipes[i]});
         }
         KernelSpec receiver{
             .unique_id = KernelSpecName{"receiver"},
@@ -177,7 +177,7 @@ void DramPrefetcherConsumerDeviceOperation::ProgramFactory::override_runtime_arg
     tt::tt_metal::ProgramRunArgs run_args;
     for (size_t i = 0; i < operation_attributes.prefetcher_pipes.size(); ++i) {
         run_args.advanced_options.prefetcher_pipe_args.emplace(
-            pipe_param_name(i), tt::tt_metal::PrefetcherPipeArgument{*operation_attributes.prefetcher_pipes[i]});
+            pipe_param_name(i), metal_exp::PrefetcherPipeArgument{*operation_attributes.prefetcher_pipes[i]});
     }
     for (auto& [coordinate_range, program] : cached_workload.workload.get_programs()) {
         metal_exp::UpdateProgramRunArgs(program, run_args);

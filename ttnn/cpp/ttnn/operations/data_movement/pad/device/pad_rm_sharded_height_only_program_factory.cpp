@@ -11,6 +11,7 @@
 #include "ttnn/operations/data_movement/common/common.hpp"
 
 using namespace tt::tt_metal;
+using tt::tt_metal::experimental::AdvancedKernelRunArgs;
 using namespace tt::constants;
 
 namespace ttnn::prim {

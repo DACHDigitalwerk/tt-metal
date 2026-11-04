@@ -37,7 +37,8 @@ const Table<NodeCoord, std::vector<uint32_t>>& kernel_runtime_varargs(const Prog
     return kp.advanced_options.runtime_varargs;
 }
 
-const AdvancedKernelRunArgs::Varargs& kernel_common_runtime_varargs(const ProgramRunArgs::KernelRunArgs& kp) {
+const experimental::AdvancedKernelRunArgs::Varargs& kernel_common_runtime_varargs(
+    const ProgramRunArgs::KernelRunArgs& kp) {
     return kp.advanced_options.common_runtime_varargs;
 }
 
@@ -335,7 +336,8 @@ void RejectPrefetcherPipeRelayResize(
 // bind time in ProgramImpl::bind_prefetcher_pipe_parameters.
 void ValidatePrefetcherPipeArgs(
     const Program& program,
-    const Table<experimental::PrefetcherPipeParamName, AdvancedProgramRunArgs::PrefetcherPipeArgument>& pipe_args,
+    const Table<experimental::PrefetcherPipeParamName, experimental::AdvancedProgramRunArgs::PrefetcherPipeArgument>&
+        pipe_args,
     bool require_all) {
     const detail::ProgramImpl& program_impl = program.impl();
 
@@ -397,7 +399,8 @@ void ValidatePrefetcherPipeArgs(
 // different object).
 void BindPrefetcherPipeArgs(
     detail::ProgramImpl& program_impl,
-    const Table<experimental::PrefetcherPipeParamName, AdvancedProgramRunArgs::PrefetcherPipeArgument>& pipe_args) {
+    const Table<experimental::PrefetcherPipeParamName, experimental::AdvancedProgramRunArgs::PrefetcherPipeArgument>&
+        pipe_args) {
     std::vector<detail::ProgramImpl::PrefetcherPipeParameterBind> binds;
     binds.reserve(pipe_args.size());
     for (const auto& [param_name, pipe_arg] : pipe_args) {

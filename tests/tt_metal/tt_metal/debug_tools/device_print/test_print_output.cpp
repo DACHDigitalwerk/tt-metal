@@ -76,7 +76,7 @@ ProgramSpec MakeQuasarPrintSpec(
             .source = std::filesystem::path{kernel_path},
             .num_threads = dm_threads,
             .hw_config = DataMovementHardwareConfig{},
-            .advanced_options = KernelAdvancedOptions{.num_runtime_varargs = 1},
+            .advanced_options = tt_metal::experimental::KernelAdvancedOptions{.num_runtime_varargs = 1},
         });
         placed.push_back(KernelSpecName{"dm_print"});
     }
@@ -86,7 +86,7 @@ ProgramSpec MakeQuasarPrintSpec(
             .source = std::filesystem::path{kernel_path},
             .num_threads = compute_engines,
             .hw_config = ComputeHardwareConfig{},
-            .advanced_options = KernelAdvancedOptions{.num_runtime_varargs = 1},
+            .advanced_options = tt_metal::experimental::KernelAdvancedOptions{.num_runtime_varargs = 1},
         });
         placed.push_back(KernelSpecName{"compute_print"});
     }
@@ -123,7 +123,8 @@ ProgramRunArgs MakeIterationArgs(const ProgramSpec& spec, uint32_t iterations) {
     for (const auto& kernel : spec.kernels) {
         args.kernel_run_args.push_back(ProgramRunArgs::KernelRunArgs{
             .kernel = kernel.unique_id,
-            .advanced_options = AdvancedKernelRunArgs{.runtime_varargs = {{node, {iterations}}}},
+            .advanced_options =
+                tt_metal::experimental::AdvancedKernelRunArgs{.runtime_varargs = {{node, {iterations}}}},
         });
     }
     return args;

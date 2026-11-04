@@ -139,7 +139,7 @@ inline bool same_node_set(const NodeRangeSet& a, const NodeRangeSet& b) {
 // The nodes of a kernel binding a PrefetcherPipe accessor group that its role is derived from: all
 // of them but the binding's extra nodes, which take no part in the group's pipes.
 inline NodeRangeSet prefetcher_pipe_role_nodes(
-    const NodeRangeSet& kernel_nodes, const KernelAdvancedOptions::PrefetcherPipeBinding& binding) {
+    const NodeRangeSet& kernel_nodes, const experimental::KernelAdvancedOptions::PrefetcherPipeBinding& binding) {
     return kernel_nodes.subtract(binding.extra_nodes);
 }
 

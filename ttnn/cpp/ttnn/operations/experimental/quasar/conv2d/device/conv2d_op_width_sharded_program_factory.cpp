@@ -854,7 +854,7 @@ ttnn::device_operation::ProgramArtifacts Conv2dWidthShardedProgramFactory::creat
                 {"num_cores_x", full_core_grid.x},
             });
         // X/Y mcast lookup tables as per-node varargs.
-        m2::AdvancedKernelRunArgs::Varargs varargs;
+        m2::experimental::AdvancedKernelRunArgs::Varargs varargs;
         varargs.reserve(act_mcast_noc_x.size() + act_mcast_noc_y.size());
         varargs.insert(varargs.end(), act_mcast_noc_x.begin(), act_mcast_noc_x.end());
         varargs.insert(varargs.end(), act_mcast_noc_y.begin(), act_mcast_noc_y.end());

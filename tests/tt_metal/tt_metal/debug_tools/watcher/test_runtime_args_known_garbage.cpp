@@ -284,7 +284,7 @@ TEST_F(RTATestFixture, CorrectArgDispatchAndPayloadValidation) {
         .num_threads = is_quasar ? num_dms_ : 1u,
         .hw_config = dm_cfg,
         .advanced_options =
-            KernelAdvancedOptions{
+            experimental::KernelAdvancedOptions{
                 .num_runtime_varargs = default_rtas.size(),
                 .num_common_runtime_varargs = default_crtas.size(),
             },
@@ -311,7 +311,7 @@ TEST_F(RTATestFixture, CorrectArgDispatchAndPayloadValidation) {
         ProgramRunArgs params;
         ProgramRunArgs::KernelRunArgs krp{
             .advanced_options =
-                AdvancedKernelRunArgs{
+                experimental::AdvancedKernelRunArgs{
                     .common_runtime_varargs = default_crtas,
                 },
         };
@@ -399,7 +399,7 @@ TEST_P(RTAAssertTest, OutOfBoundsArgAccessDetection) {
 
     // RTA test reads index == default_rtas.size() (one past the end), so the kernel must declare
     // exactly default_rtas.size() varargs to make that access OOB.
-    KernelAdvancedOptions adv_opts;
+    experimental::KernelAdvancedOptions adv_opts;
     if (params.test_rta) {
         adv_opts.num_runtime_varargs = default_rtas.size();
     } else {
@@ -490,7 +490,7 @@ TEST_F(RTATestFixture, QuasarMultiDMOutOfBoundsArgDetection) {
         .compile_time_args = {{"num_dms", num_dms_}, {"l1_sync_addr", l1_unreserved_base}},
         .hw_config = DataMovementHardwareConfig{},
         .advanced_options =
-            KernelAdvancedOptions{
+            experimental::KernelAdvancedOptions{
                 .num_runtime_varargs = default_rtas.size(),
             },
     };
