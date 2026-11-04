@@ -17,11 +17,7 @@ from models.demos.deepseek_v3_d_p.tests.kda.utils import (
 )
 from models.demos.deepseek_v3_d_p.tt.kda.config import KDAProgramConfig
 from models.demos.deepseek_v3_d_p.tt.kda.kda import KdaState, ttKDA
-from tests.ttnn.unit_tests.operations.experimental.kda.kda_test_utils import (
-    assert_accurate,
-    assert_bit_identical,
-    make_actual_start,
-)
+from tt_py_test_utils_common.kda_test_utils import assert_accurate, assert_bit_identical, make_actual_start
 
 pytestmark = [run_for_blackhole(), pytest.mark.use_module_device]
 
