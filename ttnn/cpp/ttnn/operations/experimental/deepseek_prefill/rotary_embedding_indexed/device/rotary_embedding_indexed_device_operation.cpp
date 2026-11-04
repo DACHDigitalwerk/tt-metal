@@ -12,8 +12,8 @@
 #include <tt-metalium/host_api.hpp>
 #include <tt-metalium/work_split.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
+#include <tt-metalium/workload/specification/program_spec.hpp>
+#include <tt-metalium/workload/run_args/program_run_args.hpp>
 
 #include "ttnn/device.hpp"
 #include "ttnn/operation.hpp"
@@ -26,7 +26,7 @@ namespace ttnn::operations::experimental::deepseek_prefill::rotary_embedding_ind
 
 using namespace tt::tt_metal;
 using namespace tt::constants;
-using namespace tt::tt_metal::experimental;
+using namespace tt::tt_metal;
 // Reused-kernel binding vocabulary (CB / tensor names, writer+compute sources) — single-sourced here.
 using namespace ttnn::experimental::prim::rope_metal2;
 

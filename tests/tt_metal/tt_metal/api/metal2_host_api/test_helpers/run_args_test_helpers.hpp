@@ -14,14 +14,14 @@
 
 #include <gtest/gtest.h>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
+#include <tt-metalium/workload/run_args/program_run_args.hpp>
+#include <tt-metalium/workload/specification/program_spec.hpp>
 #include "impl/kernels/kernel.hpp"
 #include "impl/program/program_impl.hpp"
 
 #include "metal2_host_api/test_helpers/test_helpers.hpp"
 
-namespace tt::tt_metal::experimental::test_helpers {
+namespace tt::tt_metal::test_helpers {
 
 // Create a ProgramSpec with specified RTA schema for the DM kernel
 // (The compute kernel has no RTAs)
@@ -121,7 +121,7 @@ inline ProgramSpec MakeBorrowedDFBProgramSpecForRunArgs(
     producer.dfb_bindings.push_back(ProducerOf(DFBSpecName{"dfb"}, "out"));
     consumer.dfb_bindings.push_back(ConsumerOf(DFBSpecName{"dfb"}, "in"));
 
-    auto tensor_param = MakeMinimalTensorParameter(tensor_param_name, tt::tt_metal::BufferType::L1);
+    auto tensor_param = MakeMinimalTensorParameter(tensor_param_name, BufferType::L1);
     BindTensorParameterToKernel(producer, tensor_param_name, "borrowed_t");
 
     spec.kernels = {producer, consumer};
@@ -147,4 +147,4 @@ inline uint32_t ReadBindingAddressFromCRTA(
     return 0;
 }
 
-}  // namespace tt::tt_metal::experimental::test_helpers
+}  // namespace tt::tt_metal::test_helpers

@@ -24,8 +24,8 @@
 #include <tt-metalium/tt_metal.hpp>
 #include <tt-logger/tt-logger.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
+#include <tt-metalium/workload/specification/program_spec.hpp>
+#include <tt-metalium/workload/run_args/program_run_args.hpp>
 #include <tt-metalium/tensor/mesh_tensor.hpp>
 #include <tt-metalium/experimental/distributed_tensor/topology/tensor_topology.hpp>
 #include <tt-metalium/tensor/spec/tensor_spec.hpp>
@@ -42,8 +42,6 @@
 
 namespace tt::tt_metal {
 namespace {
-
-using namespace experimental;
 
 constexpr const char* ALIAS_PRODUCER_KERNEL =
     "tests/tt_metal/tt_metal/test_kernels/dataflow/alias_dfb_producer.cpp";
@@ -68,16 +66,16 @@ inline TensorSpec make_alias_l1_tensor_spec(uint32_t entry_size, uint32_t num_en
 
 // Build a DataflowBufferConfig for direct-API tests (no kernel compilation).
 // producer = DM RISC 0, consumer = DM RISC 1 (valid on WH/BH and Quasar).
-inline dfb::DataflowBufferConfig make_1sx1s_config(uint32_t entry_size, uint32_t num_entries) {
-    return dfb::DataflowBufferConfig{
+inline experimental::dfb::DataflowBufferConfig make_1sx1s_config(uint32_t entry_size, uint32_t num_entries) {
+    return experimental::dfb::DataflowBufferConfig{
         .entry_size = entry_size,
         .num_entries = num_entries,
         .producer_risc_mask = 0x1,
         .num_producers = 1,
-        .pap = dfb::AccessPattern::STRIDED,
+        .pap = experimental::dfb::AccessPattern::STRIDED,
         .consumer_risc_mask = 0x2,
         .num_consumers = 1,
-        .cap = dfb::AccessPattern::STRIDED,
+        .cap = experimental::dfb::AccessPattern::STRIDED,
         .enable_producer_implicit_sync = false,
         .enable_consumer_implicit_sync = false,
     };
@@ -147,39 +145,39 @@ AliasDFBProgramComponents make_alias_dfb_program_spec(
     }
 
     DataflowBufferSpec dfb_a{
-        .unique_id = experimental::DFBSpecName{"dfb_a"},
+        .unique_id = DFBSpecName{"dfb_a"},
         .entry_size = entry_size_a,
         .num_entries = num_entries_a,
         .data_format_metadata = tt::DataFormat::Float16_b,
-        .advanced_options = DFBAdvancedOptions{.alias_with = {experimental::DFBSpecName{"dfb_b"}}},
+        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_b"}}},
     };
     DataflowBufferSpec dfb_b{
-        .unique_id = experimental::DFBSpecName{"dfb_b"},
+        .unique_id = DFBSpecName{"dfb_b"},
         .entry_size = entry_size_b,
         .num_entries = num_entries_b,
         .data_format_metadata = tt::DataFormat::Float16_b,
-        .advanced_options = DFBAdvancedOptions{.alias_with = {experimental::DFBSpecName{"dfb_a"}}},
+        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_a"}}},
     };
 
     KernelSpec producer{
-        .unique_id = experimental::KernelSpecName{"producer"},
+        .unique_id = KernelSpecName{"producer"},
         .source = ALIAS_PRODUCER_KERNEL,
         .num_threads = num_producers,
         .dfb_bindings =
             {
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_a"},
+                {.dfb_spec_name = DFBSpecName{"dfb_a"},
                  .accessor_name = "out_a",
                  .endpoint_type = DFBEndpointType::PRODUCER,
                  .access_pattern = DFBAccessPattern::STRIDED},
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_b"},
+                {.dfb_spec_name = DFBSpecName{"dfb_b"},
                  .accessor_name = "out_b",
                  .endpoint_type = DFBEndpointType::PRODUCER,
                  .access_pattern = DFBAccessPattern::STRIDED},
             },
         .tensor_bindings =
             {
-                {.tensor_parameter_name = experimental::TensorParamName{"in_tensor_a"}, .accessor_name = "src_a"},
-                {.tensor_parameter_name = experimental::TensorParamName{"in_tensor_b"}, .accessor_name = "src_b"},
+                {.tensor_parameter_name = TensorParamName{"in_tensor_a"}, .accessor_name = "src_a"},
+                {.tensor_parameter_name = TensorParamName{"in_tensor_b"}, .accessor_name = "src_b"},
             },
         .compile_time_args =
             {
@@ -193,24 +191,24 @@ AliasDFBProgramComponents make_alias_dfb_program_spec(
     };
 
     KernelSpec consumer{
-        .unique_id = experimental::KernelSpecName{"consumer"},
+        .unique_id = KernelSpecName{"consumer"},
         .source = ALIAS_CONSUMER_KERNEL,
         .num_threads = num_consumers,
         .dfb_bindings =
             {
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_a"},
+                {.dfb_spec_name = DFBSpecName{"dfb_a"},
                  .accessor_name = "in_a",
                  .endpoint_type = DFBEndpointType::CONSUMER,
                  .access_pattern = DFBAccessPattern::STRIDED},
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_b"},
+                {.dfb_spec_name = DFBSpecName{"dfb_b"},
                  .accessor_name = "in_b",
                  .endpoint_type = DFBEndpointType::CONSUMER,
                  .access_pattern = DFBAccessPattern::STRIDED},
             },
         .tensor_bindings =
             {
-                {.tensor_parameter_name = experimental::TensorParamName{"out_tensor_a"}, .accessor_name = "dst_a"},
-                {.tensor_parameter_name = experimental::TensorParamName{"out_tensor_b"}, .accessor_name = "dst_b"},
+                {.tensor_parameter_name = TensorParamName{"out_tensor_a"}, .accessor_name = "dst_a"},
+                {.tensor_parameter_name = TensorParamName{"out_tensor_b"}, .accessor_name = "dst_b"},
             },
         .compile_time_args =
             {
@@ -229,14 +227,14 @@ AliasDFBProgramComponents make_alias_dfb_program_spec(
         .dataflow_buffers = {dfb_a, dfb_b},
         .tensor_parameters =
             {
-                {.unique_id = experimental::TensorParamName{"in_tensor_a"}, .spec = in_a.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"in_tensor_b"}, .spec = in_b.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"out_tensor_a"}, .spec = out_a.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"out_tensor_b"}, .spec = out_b.tensor_spec()},
+                {.unique_id = TensorParamName{"in_tensor_a"}, .spec = in_a.tensor_spec()},
+                {.unique_id = TensorParamName{"in_tensor_b"}, .spec = in_b.tensor_spec()},
+                {.unique_id = TensorParamName{"out_tensor_a"}, .spec = out_a.tensor_spec()},
+                {.unique_id = TensorParamName{"out_tensor_b"}, .spec = out_b.tensor_spec()},
             },
         .work_units = {WorkUnitSpec{
             .name = "wu",
-            .kernels = {experimental::KernelSpecName{"producer"}, experimental::KernelSpecName{"consumer"}},
+            .kernels = {KernelSpecName{"producer"}, KernelSpecName{"consumer"}},
             .target_nodes = node,
         }},
     };
@@ -275,19 +273,19 @@ void run_alias_dfb_program(
     ProgramRunArgs run_params;
     run_params.kernel_run_args = {
         ProgramRunArgs::KernelRunArgs{
-            .kernel = experimental::KernelSpecName{"producer"},
+            .kernel = KernelSpecName{"producer"},
             .runtime_arg_values = rtas(num_entries_a, num_entries_b),
         },
         ProgramRunArgs::KernelRunArgs{
-            .kernel = experimental::KernelSpecName{"consumer"},
+            .kernel = KernelSpecName{"consumer"},
             .runtime_arg_values = rtas(num_entries_a, num_entries_b),
         },
     };
     run_params.tensor_args = {
-        {experimental::TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
-        {experimental::TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
-        {experimental::TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
-        {experimental::TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
+        {TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
+        {TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
+        {TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
+        {TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
     };
     SetProgramRunArgs(program, run_params);
 
@@ -372,44 +370,44 @@ AliasBorrowedDFBComponents make_alias_borrowed_dfb_program_spec(
 
     // dfb_borrowed: backed by ring_tensor (L1)
     DataflowBufferSpec dfb_borrowed{
-        .unique_id = experimental::DFBSpecName{"dfb_borrowed"},
+        .unique_id = DFBSpecName{"dfb_borrowed"},
         .entry_size = entry_size,
         .num_entries = num_entries,
         .data_format_metadata = tt::DataFormat::Float16_b,
-        .borrowed_from = experimental::TensorParamName{"ring_tensor"},
-        .advanced_options = DFBAdvancedOptions{.alias_with = {experimental::DFBSpecName{"dfb_alias"}}},
+        .borrowed_from = TensorParamName{"ring_tensor"},
+        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_alias"}}},
     };
     DataflowBufferSpec dfb_alias_spec{
-        .unique_id = experimental::DFBSpecName{"dfb_alias"},
+        .unique_id = DFBSpecName{"dfb_alias"},
         .entry_size = entry_size,
         .num_entries = num_entries,
         .data_format_metadata = tt::DataFormat::Float16_b,
-        .borrowed_from = experimental::TensorParamName{"ring_tensor"},
-        .advanced_options = DFBAdvancedOptions{.alias_with = {experimental::DFBSpecName{"dfb_borrowed"}}},
+        .borrowed_from = TensorParamName{"ring_tensor"},
+        .advanced_options = DFBAdvancedOptions{.alias_with = {DFBSpecName{"dfb_borrowed"}}},
     };
 
     KernelSpec producer{
-        .unique_id = experimental::KernelSpecName{"producer"},
+        .unique_id = KernelSpecName{"producer"},
         .source = ALIAS_PRODUCER_KERNEL,
         .num_threads = 1,
         .dfb_bindings =
             {
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_borrowed"},
+                {.dfb_spec_name = DFBSpecName{"dfb_borrowed"},
                  .accessor_name = "out_a",
                  .endpoint_type = DFBEndpointType::PRODUCER,
                  .access_pattern = DFBAccessPattern::STRIDED},
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_alias"},
+                {.dfb_spec_name = DFBSpecName{"dfb_alias"},
                  .accessor_name = "out_b",
                  .endpoint_type = DFBEndpointType::PRODUCER,
                  .access_pattern = DFBAccessPattern::STRIDED},
             },
         .tensor_bindings =
             {
-                {.tensor_parameter_name = experimental::TensorParamName{"in_tensor_a"}, .accessor_name = "src_a"},
-                {.tensor_parameter_name = experimental::TensorParamName{"in_tensor_b"}, .accessor_name = "src_b"},
+                {.tensor_parameter_name = TensorParamName{"in_tensor_a"}, .accessor_name = "src_a"},
+                {.tensor_parameter_name = TensorParamName{"in_tensor_b"}, .accessor_name = "src_b"},
                 // ring_tensor must be bound to at least one kernel even though the
                 // kernel doesn't access it directly (required by TensorParameter rules).
-                {.tensor_parameter_name = experimental::TensorParamName{"ring_tensor"}, .accessor_name = "ring"},
+                {.tensor_parameter_name = TensorParamName{"ring_tensor"}, .accessor_name = "ring"},
             },
         .compile_time_args =
             {
@@ -423,24 +421,24 @@ AliasBorrowedDFBComponents make_alias_borrowed_dfb_program_spec(
     };
 
     KernelSpec consumer{
-        .unique_id = experimental::KernelSpecName{"consumer"},
+        .unique_id = KernelSpecName{"consumer"},
         .source = ALIAS_CONSUMER_KERNEL,
         .num_threads = 1,
         .dfb_bindings =
             {
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_borrowed"},
+                {.dfb_spec_name = DFBSpecName{"dfb_borrowed"},
                  .accessor_name = "in_a",
                  .endpoint_type = DFBEndpointType::CONSUMER,
                  .access_pattern = DFBAccessPattern::STRIDED},
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_alias"},
+                {.dfb_spec_name = DFBSpecName{"dfb_alias"},
                  .accessor_name = "in_b",
                  .endpoint_type = DFBEndpointType::CONSUMER,
                  .access_pattern = DFBAccessPattern::STRIDED},
             },
         .tensor_bindings =
             {
-                {.tensor_parameter_name = experimental::TensorParamName{"out_tensor_a"}, .accessor_name = "dst_a"},
-                {.tensor_parameter_name = experimental::TensorParamName{"out_tensor_b"}, .accessor_name = "dst_b"},
+                {.tensor_parameter_name = TensorParamName{"out_tensor_a"}, .accessor_name = "dst_a"},
+                {.tensor_parameter_name = TensorParamName{"out_tensor_b"}, .accessor_name = "dst_b"},
             },
         .compile_time_args =
             {
@@ -459,15 +457,15 @@ AliasBorrowedDFBComponents make_alias_borrowed_dfb_program_spec(
         .dataflow_buffers = {dfb_borrowed, dfb_alias_spec},
         .tensor_parameters =
             {
-                {.unique_id = experimental::TensorParamName{"in_tensor_a"}, .spec = in_a.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"in_tensor_b"}, .spec = in_b.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"out_tensor_a"}, .spec = out_a.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"out_tensor_b"}, .spec = out_b.tensor_spec()},
-                {.unique_id = experimental::TensorParamName{"ring_tensor"}, .spec = ring.tensor_spec()},
+                {.unique_id = TensorParamName{"in_tensor_a"}, .spec = in_a.tensor_spec()},
+                {.unique_id = TensorParamName{"in_tensor_b"}, .spec = in_b.tensor_spec()},
+                {.unique_id = TensorParamName{"out_tensor_a"}, .spec = out_a.tensor_spec()},
+                {.unique_id = TensorParamName{"out_tensor_b"}, .spec = out_b.tensor_spec()},
+                {.unique_id = TensorParamName{"ring_tensor"}, .spec = ring.tensor_spec()},
             },
         .work_units = {WorkUnitSpec{
             .name = "wu",
-            .kernels = {experimental::KernelSpecName{"producer"}, experimental::KernelSpecName{"consumer"}},
+            .kernels = {KernelSpecName{"producer"}, KernelSpecName{"consumer"}},
             .target_nodes = node,
         }},
     };
@@ -713,9 +711,9 @@ TEST_F(UnitMeshFixture, AliasDFBAllocSecondarySkipped) {
     const auto cfg_c = make_1sx1s_config(512, 4);
 
     Program program = CreateProgram(this->device());
-    const uint32_t id_a = dfb::CreateDataflowBuffer(program, core, cfg_a);
-    const uint32_t id_b = dfb::CreateDataflowBuffer(program, core, cfg_b);
-    const uint32_t id_c = dfb::CreateDataflowBuffer(program, core, cfg_c);
+    const uint32_t id_a = experimental::dfb::CreateDataflowBuffer(program, core, cfg_a);
+    const uint32_t id_b = experimental::dfb::CreateDataflowBuffer(program, core, cfg_b);
+    const uint32_t id_c = experimental::dfb::CreateDataflowBuffer(program, core, cfg_c);
 
     program.impl().set_dfb_alias(id_a, id_b);
     program.impl().finalize_dataflow_buffer_configs();
@@ -744,9 +742,9 @@ TEST_F(UnitMeshFixture, AliasDFBAlloc3Way) {
     const auto cfg_c = make_1sx1s_config(1024, 4);
 
     Program program = CreateProgram(this->device());
-    const uint32_t id_a = dfb::CreateDataflowBuffer(program, core, cfg_a);
-    const uint32_t id_b = dfb::CreateDataflowBuffer(program, core, cfg_b);
-    const uint32_t id_c = dfb::CreateDataflowBuffer(program, core, cfg_c);
+    const uint32_t id_a = experimental::dfb::CreateDataflowBuffer(program, core, cfg_a);
+    const uint32_t id_b = experimental::dfb::CreateDataflowBuffer(program, core, cfg_b);
+    const uint32_t id_c = experimental::dfb::CreateDataflowBuffer(program, core, cfg_c);
 
     program.impl().set_dfb_alias(id_a, id_b);
     program.impl().set_dfb_alias(id_a, id_c);
@@ -777,9 +775,9 @@ TEST_F(UnitMeshFixture, AliasDFBAgreedGroupResize) {
     const auto cfg_c = make_1sx1s_config(512, 4);   // total 2048 (trailing, non-aliased)
 
     Program program = CreateProgram(this->device());
-    const uint32_t id_a = dfb::CreateDataflowBuffer(program, core, cfg_a);
-    const uint32_t id_b = dfb::CreateDataflowBuffer(program, core, cfg_b);
-    const uint32_t id_c = dfb::CreateDataflowBuffer(program, core, cfg_c);
+    const uint32_t id_a = experimental::dfb::CreateDataflowBuffer(program, core, cfg_a);
+    const uint32_t id_b = experimental::dfb::CreateDataflowBuffer(program, core, cfg_b);
+    const uint32_t id_c = experimental::dfb::CreateDataflowBuffer(program, core, cfg_c);
     program.impl().set_dfb_alias(id_a, id_b);
 
     program.impl().finalize_dataflow_buffer_configs();
@@ -840,20 +838,20 @@ TEST_F(UnitMeshFixture, AliasDFBBorrowedMemoryAddressEquality) {
     ProgramRunArgs run_params;
     run_params.kernel_run_args = {
         ProgramRunArgs::KernelRunArgs{
-            .kernel = experimental::KernelSpecName{"producer"},
+            .kernel = KernelSpecName{"producer"},
             .runtime_arg_values = rtas(),
         },
         ProgramRunArgs::KernelRunArgs{
-            .kernel = experimental::KernelSpecName{"consumer"},
+            .kernel = KernelSpecName{"consumer"},
             .runtime_arg_values = rtas(),
         },
     };
     run_params.tensor_args = {
-        {experimental::TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
-        {experimental::TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
-        {experimental::TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
-        {experimental::TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
-        {experimental::TensorParamName{"ring_tensor"}, TensorArgument{ring}},
+        {TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
+        {TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
+        {TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
+        {TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
+        {TensorParamName{"ring_tensor"}, TensorArgument{ring}},
     };
     SetProgramRunArgs(program, run_params);
 
@@ -898,20 +896,20 @@ TEST_F(UnitMeshFixture, AliasDFBBorrowedMemoryDataFlow1Sx1S) {
     ProgramRunArgs run_params;
     run_params.kernel_run_args = {
         ProgramRunArgs::KernelRunArgs{
-            .kernel = experimental::KernelSpecName{"producer"},
+            .kernel = KernelSpecName{"producer"},
             .runtime_arg_values = rtas(),
         },
         ProgramRunArgs::KernelRunArgs{
-            .kernel = experimental::KernelSpecName{"consumer"},
+            .kernel = KernelSpecName{"consumer"},
             .runtime_arg_values = rtas(),
         },
     };
     run_params.tensor_args = {
-        {experimental::TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
-        {experimental::TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
-        {experimental::TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
-        {experimental::TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
-        {experimental::TensorParamName{"ring_tensor"}, TensorArgument{ring}},
+        {TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
+        {TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
+        {TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
+        {TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
+        {TensorParamName{"ring_tensor"}, TensorArgument{ring}},
     };
     SetProgramRunArgs(program, run_params);
 
@@ -962,15 +960,15 @@ TEST_F(UnitMeshFixture, BorrowedMemoryDFBBufRw) {
     };
     ProgramRunArgs run_params;
     run_params.kernel_run_args = {
-        ProgramRunArgs::KernelRunArgs{.kernel = experimental::KernelSpecName{"producer"}, .runtime_arg_values = rtas()},
-        ProgramRunArgs::KernelRunArgs{.kernel = experimental::KernelSpecName{"consumer"}, .runtime_arg_values = rtas()},
+        ProgramRunArgs::KernelRunArgs{.kernel = KernelSpecName{"producer"}, .runtime_arg_values = rtas()},
+        ProgramRunArgs::KernelRunArgs{.kernel = KernelSpecName{"consumer"}, .runtime_arg_values = rtas()},
     };
     run_params.tensor_args = {
-        {experimental::TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
-        {experimental::TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
-        {experimental::TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
-        {experimental::TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
-        {experimental::TensorParamName{"ring_tensor"}, TensorArgument{ring}},
+        {TensorParamName{"in_tensor_a"}, TensorArgument{in_a}},
+        {TensorParamName{"in_tensor_b"}, TensorArgument{in_b}},
+        {TensorParamName{"out_tensor_a"}, TensorArgument{out_a}},
+        {TensorParamName{"out_tensor_b"}, TensorArgument{out_b}},
+        {TensorParamName{"ring_tensor"}, TensorArgument{ring}},
     };
     SetProgramRunArgs(program, run_params);
     if (this->device().arch() == ARCH::QUASAR) {
@@ -1027,41 +1025,39 @@ TEST_F(UnitMeshFixture, BorrowedMemorySelfLoopDFBBufRw) {
         MeshTensor::allocate_on_device(this->device(), make_alias_l1_tensor_spec(kEntrySize, kNumEntries));
 
     KernelSpec loop{
-        .unique_id = experimental::KernelSpecName{"loop"},
+        .unique_id = KernelSpecName{"loop"},
         .source = KernelSpec::SourceCode{"void kernel_main() {}"},
         .num_threads = 1,
         .dfb_bindings =
             {
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_loop"},
+                {.dfb_spec_name = DFBSpecName{"dfb_loop"},
                  .accessor_name = "lp",
                  .endpoint_type = DFBEndpointType::PRODUCER,
                  .access_pattern = DFBAccessPattern::STRIDED},
-                {.dfb_spec_name = experimental::DFBSpecName{"dfb_loop"},
+                {.dfb_spec_name = DFBSpecName{"dfb_loop"},
                  .accessor_name = "lp",
                  .endpoint_type = DFBEndpointType::CONSUMER,
                  .access_pattern = DFBAccessPattern::STRIDED},
             },
-        .tensor_bindings =
-            {{.tensor_parameter_name = experimental::TensorParamName{"ring_tensor"}, .accessor_name = "ring"}},
+        .tensor_bindings = {{.tensor_parameter_name = TensorParamName{"ring_tensor"}, .accessor_name = "ring"}},
         .hw_config = ComputeHardwareConfig{},
     };
     ProgramSpec spec{
         .name = "borrowed_self_loop",
         .kernels = {loop},
         .dataflow_buffers = {DataflowBufferSpec{
-            .unique_id = experimental::DFBSpecName{"dfb_loop"},
+            .unique_id = DFBSpecName{"dfb_loop"},
             .entry_size = kEntrySize,
             .num_entries = kNumEntries,
             .data_format_metadata = tt::DataFormat::Float16_b,
-            .borrowed_from = experimental::TensorParamName{"ring_tensor"},
+            .borrowed_from = TensorParamName{"ring_tensor"},
         }},
-        .tensor_parameters = {{.unique_id = experimental::TensorParamName{"ring_tensor"}, .spec = ring.tensor_spec()}},
-        .work_units = {WorkUnitSpec{
-            .name = "wu", .kernels = {experimental::KernelSpecName{"loop"}}, .target_nodes = node}},
+        .tensor_parameters = {{.unique_id = TensorParamName{"ring_tensor"}, .spec = ring.tensor_spec()}},
+        .work_units = {WorkUnitSpec{.name = "wu", .kernels = {KernelSpecName{"loop"}}, .target_nodes = node}},
     };
     Program program = MakeProgramFromSpec(this->device(), spec);
     ProgramRunArgs run_params;
-    run_params.tensor_args = {{experimental::TensorParamName{"ring_tensor"}, TensorArgument{ring}}};
+    run_params.tensor_args = {{TensorParamName{"ring_tensor"}, TensorArgument{ring}}};
     SetProgramRunArgs(program, run_params);
     distributed::MeshWorkload wl = LaunchProgram(this->device(), std::move(program));
 

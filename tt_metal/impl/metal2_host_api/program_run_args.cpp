@@ -12,9 +12,9 @@
 
 #include <tt-logger/tt-logger.hpp>
 #include <tt-metalium/runtime_args_data.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
+#include <tt-metalium/workload/run_args/program_run_args.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/tensor_spec_relaxations.hpp>
+#include <tt-metalium/workload/specification/tensor_spec_relaxations.hpp>
 #include <tt-metalium/experimental/per_core_allocation/buffer.hpp>
 #include <tt-metalium/experimental/prefetcher_pipe.hpp>
 #include <tt-metalium/mesh_buffer.hpp>
@@ -23,7 +23,7 @@
 #include "impl/metal2_host_api/tensor_binding_crtas.hpp"
 #include "impl/program/program_impl.hpp"
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 // Validation Helpers
@@ -335,7 +335,7 @@ void RejectPrefetcherPipeRelayResize(
 // bind time in ProgramImpl::bind_prefetcher_pipe_parameters.
 void ValidatePrefetcherPipeArgs(
     const Program& program,
-    const Table<PrefetcherPipeParamName, AdvancedProgramRunArgs::PrefetcherPipeArgument>& pipe_args,
+    const Table<experimental::PrefetcherPipeParamName, AdvancedProgramRunArgs::PrefetcherPipeArgument>& pipe_args,
     bool require_all) {
     const detail::ProgramImpl& program_impl = program.impl();
 
@@ -348,7 +348,7 @@ void ValidatePrefetcherPipeArgs(
             "ProgramRunArgs supplies a PrefetcherPipe argument for '{}', but the Program declares no "
             "PrefetcherPipeParameter of that name.",
             param_name);
-        const PrefetcherPipe& pipe = pipe_arg.get();
+        const experimental::PrefetcherPipe& pipe = pipe_arg.get();
         TT_FATAL(
             pipe.get_device() == binding->device,
             "PrefetcherPipeArgument for '{}' supplies a pipe allocated on a different MeshDevice than the one this "
@@ -397,7 +397,7 @@ void ValidatePrefetcherPipeArgs(
 // different object).
 void BindPrefetcherPipeArgs(
     detail::ProgramImpl& program_impl,
-    const Table<PrefetcherPipeParamName, AdvancedProgramRunArgs::PrefetcherPipeArgument>& pipe_args) {
+    const Table<experimental::PrefetcherPipeParamName, AdvancedProgramRunArgs::PrefetcherPipeArgument>& pipe_args) {
     std::vector<detail::ProgramImpl::PrefetcherPipeParameterBind> binds;
     binds.reserve(pipe_args.size());
     for (const auto& [param_name, pipe_arg] : pipe_args) {
@@ -691,10 +691,10 @@ void PatchPerNodeBindingRtas(
         // TensorSpec validation already pins the per-node allocation flag (it is part of MemoryConfig equality),
         // so this only trips if the buffer disagrees with its own tensor's MemoryConfig.
         TT_FATAL(
-            per_core_allocation::is_per_core_allocation(*buffer),
+            experimental::per_core_allocation::is_per_core_allocation(*buffer),
             "Tensor argument for per-node TensorParameter '{}' is backed by a Buffer that is not per-node allocated.",
             handle.tensor_parameter_name);
-        const auto& node_addresses = per_core_allocation::get_per_core_addresses(*buffer);
+        const auto& node_addresses = experimental::per_core_allocation::get_per_core_addresses(*buffer);
         const uint32_t word = handle.addr_rta_offset / sizeof(uint32_t);
         for (const CoreCoord& node : kernel.logical_cores()) {
             auto a_it = node_addresses.find(node);
@@ -1769,4 +1769,4 @@ ProgramRunArgs MergeProgramRunArgs(ProgramRunArgs base, std::span<const ProgramR
     return base;
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

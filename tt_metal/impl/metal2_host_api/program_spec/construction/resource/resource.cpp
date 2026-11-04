@@ -4,7 +4,7 @@
 
 #include "impl/metal2_host_api/program_spec/construction/resource/resource.hpp"
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 ProgramResources RegisterResources(
     distributed::MeshDevice& mesh_device,
@@ -50,4 +50,4 @@ KernelResourceBindings ResolveKernelResourceBindings(
     return bindings;
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

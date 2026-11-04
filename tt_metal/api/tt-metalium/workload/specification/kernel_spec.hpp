@@ -13,15 +13,15 @@
 #include <vector>
 
 #include <tt-metalium/experimental/metal2_host_api/advanced_options.hpp>
-#include <tt-metalium/experimental/metal2_host_api/arg_value.hpp>
-#include <tt-metalium/experimental/metal2_host_api/compute_hardware_config.hpp>
-#include <tt-metalium/experimental/metal2_host_api/data_movement_hardware_config.hpp>
-#include <tt-metalium/experimental/metal2_host_api/dataflow_buffer_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/semaphore_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/scratchpad_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/utility/group.hpp>
-#include <tt-metalium/experimental/metal2_host_api/utility/table.hpp>
-#include <tt-metalium/experimental/metal2_host_api/tensor_parameter.hpp>
+#include <tt-metalium/workload/specification/arg_value.hpp>
+#include <tt-metalium/workload/specification/compute_hardware_config.hpp>
+#include <tt-metalium/workload/specification/data_movement_hardware_config.hpp>
+#include <tt-metalium/workload/specification/dataflow_buffer_spec.hpp>
+#include <tt-metalium/workload/specification/semaphore_spec.hpp>
+#include <tt-metalium/workload/specification/scratchpad_spec.hpp>
+#include <tt-metalium/workload/specification/utility/group.hpp>
+#include <tt-metalium/workload/specification/utility/table.hpp>
+#include <tt-metalium/workload/specification/tensor_parameter.hpp>
 #include <tt_stl/strong_type.hpp>
 #include <tt-metalium/kernel_types.hpp>
 

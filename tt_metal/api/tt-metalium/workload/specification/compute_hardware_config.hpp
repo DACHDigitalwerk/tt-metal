@@ -6,8 +6,8 @@
 
 #include <optional>
 
-#include <tt-metalium/experimental/metal2_host_api/dataflow_buffer_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/utility/table.hpp>
+#include <tt-metalium/workload/specification/dataflow_buffer_spec.hpp>
+#include <tt-metalium/workload/specification/utility/table.hpp>
 #include <tt-metalium/base_types.hpp>  // For MathFidelity, UnpackToDestMode
 
 namespace tt::tt_metal {

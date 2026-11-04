@@ -36,8 +36,8 @@
 
 #include <tt-metalium/experimental/dispatch_context.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
+#include <tt-metalium/workload/run_args/program_run_args.hpp>
+#include <tt-metalium/workload/specification/program_spec.hpp>
 #include <tt-metalium/experimental/prefetcher_pipe.hpp>
 #include "impl/allocator/allocator.hpp"
 #include "impl/dataflow_buffer/dataflow_buffer_impl.hpp"
@@ -94,7 +94,7 @@ private:
 
 namespace {
 
-namespace m2 = tt::tt_metal::experimental;
+namespace m2 = tt::tt_metal;
 
 bool is_quasar_arch() { return MetalContext::instance().get_cluster().arch() == tt::ARCH::QUASAR; }
 
@@ -108,15 +108,15 @@ constexpr const char* relay_trisc_kernel_path =
 constexpr const char* blank_kernel_path = "tests/tt_metal/tt_metal/test_kernels/dataflow/blank.cpp";
 
 // The one PrefetcherPipeParameter of a single-pipe Program.
-const m2::PrefetcherPipeParamName pipe_param{"pipe"};
+const experimental::PrefetcherPipeParamName pipe_param{"pipe"};
 
 // ============================================================================
 // Persistent resources
 // ============================================================================
 
-m2::PrefetcherPipeSpaceConfig one_pipe_space_config(
+experimental::PrefetcherPipeSpaceConfig one_pipe_space_config(
     CoreCoord sender, const CoreRangeSet& receivers, uint32_t ring_size) {
-    return m2::PrefetcherPipeSpaceConfig{
+    return experimental::PrefetcherPipeSpaceConfig{
         .sender_cores = CoreRangeSet(CoreRange(sender)),
         .receiver_domain = receivers,
         .ring_size = ring_size,
@@ -174,9 +174,12 @@ m2::WorkUnitSpec work_unit(const std::string& name, const std::vector<std::strin
     return wu;
 }
 
-m2::PrefetcherPipeParameter pipe_parameter(
-    const m2::PrefetcherPipeParamName& name, const CoreRangeSet& receivers, uint32_t ring_size, uint32_t entry_size) {
-    return m2::PrefetcherPipeParameter{
+experimental::PrefetcherPipeParameter pipe_parameter(
+    const experimental::PrefetcherPipeParamName& name,
+    const CoreRangeSet& receivers,
+    uint32_t ring_size,
+    uint32_t entry_size) {
+    return experimental::PrefetcherPipeParameter{
         .unique_id = name,
         .receivers = receivers,
         .ring_size = ring_size,
@@ -185,14 +188,14 @@ m2::PrefetcherPipeParameter pipe_parameter(
 }
 
 // The parameter describing `pipe`, consumed at `entry_size`.
-m2::PrefetcherPipeParameter pipe_parameter(
-    const m2::PrefetcherPipeParamName& name, const m2::PrefetcherPipe& pipe, uint32_t entry_size) {
+experimental::PrefetcherPipeParameter pipe_parameter(
+    const experimental::PrefetcherPipeParamName& name, const experimental::PrefetcherPipe& pipe, uint32_t entry_size) {
     return pipe_parameter(name, pipe.receiver_cores(), pipe.ring_size(), entry_size);
 }
 
 void bind_pipe(
     m2::KernelSpec& kernel,
-    std::vector<m2::PrefetcherPipeParamName> pipes,
+    std::vector<experimental::PrefetcherPipeParamName> pipes,
     const std::string& accessor,
     const CoreRangeSet& extra_nodes = {}) {
     kernel.advanced_options.prefetcher_pipe_bindings.push_back(m2::PrefetcherPipeBinding{
@@ -214,7 +217,7 @@ struct SenderKernelParams {
 
 // prefetcher_pipe_sender.cpp with accessor "out" naming `pipes`. Staging address is a per-node RTA.
 m2::KernelSpec sender_kernel_spec(
-    const std::string& name, std::vector<m2::PrefetcherPipeParamName> pipes, const SenderKernelParams& p) {
+    const std::string& name, std::vector<experimental::PrefetcherPipeParamName> pipes, const SenderKernelParams& p) {
     m2::KernelSpec kernel = make_dm_kernel(name, sender_kernel_path, p.num_threads);
     bind_pipe(kernel, std::move(pipes), "out");
     kernel.compile_time_args = {
@@ -230,7 +233,7 @@ m2::KernelSpec sender_kernel_spec(
 // prefetcher_pipe_receiver.cpp with accessor "in" naming `pipes`; `num_threads` is the pipe's P.
 m2::KernelSpec receiver_kernel_spec(
     const std::string& name,
-    std::vector<m2::PrefetcherPipeParamName> pipes,
+    std::vector<experimental::PrefetcherPipeParamName> pipes,
     uint32_t num_entries,
     uint32_t num_threads = 1) {
     m2::KernelSpec kernel = make_dm_kernel(name, receiver_kernel_path, num_threads);
@@ -240,7 +243,8 @@ m2::KernelSpec receiver_kernel_spec(
 }
 
 // Staging RTA for kernel `kernel` on every sender core of `pipe`.
-m2::ProgramRunArgs::KernelRunArgs sender_staging_args(const std::string& kernel, const m2::PrefetcherPipe& pipe) {
+m2::ProgramRunArgs::KernelRunArgs sender_staging_args(
+    const std::string& kernel, const experimental::PrefetcherPipe& pipe) {
     m2::ProgramRunArgs::KernelRunArgs args{.kernel = m2::KernelSpecName{kernel}};
     for (const CoreCoord& core : corerange_to_cores(pipe.sender_cores())) {
         m2::AddRuntimeArgsForNode(
@@ -250,7 +254,7 @@ m2::ProgramRunArgs::KernelRunArgs sender_staging_args(const std::string& kernel,
 }
 
 m2::ProgramRunArgs pipe_run_args(
-    m2::PrefetcherPipe& pipe, std::vector<m2::ProgramRunArgs::KernelRunArgs> kernels = {}) {
+    experimental::PrefetcherPipe& pipe, std::vector<m2::ProgramRunArgs::KernelRunArgs> kernels = {}) {
     m2::ProgramRunArgs args;
     args.kernel_run_args = std::move(kernels);
     args.advanced_options.prefetcher_pipe_args.emplace(pipe_param, m2::PrefetcherPipeArgument{pipe});
@@ -263,7 +267,8 @@ m2::ProgramRunArgs pipe_run_args(
 
 // Sender-only Program: one sender kernel on the pipe's sender core. Staging is written and the
 // pipe bound before return.
-Program make_sender_program(distributed::MeshDevice& device, m2::PrefetcherPipe& pipe, const SenderKernelParams& p) {
+Program make_sender_program(
+    distributed::MeshDevice& device, experimental::PrefetcherPipe& pipe, const SenderKernelParams& p) {
     m2::ProgramSpec spec{
         .name = "pipe_sender",
         .kernels = {sender_kernel_spec("sender", {pipe_param}, p)},
@@ -286,7 +291,7 @@ Program make_sender_program(distributed::MeshDevice& device, m2::PrefetcherPipe&
 // Receiver-only Program: one receiver kernel (P = num_threads) on the pipe's receiver cores.
 Program make_receiver_program(
     distributed::MeshDevice& device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t num_entries,
     uint32_t num_threads = 1) {
@@ -344,7 +349,8 @@ bool ranges_overlap(uint64_t a_begin, uint64_t a_end, uint64_t b_begin, uint64_t
 
 // Allocate an L1 buffer while `space` is alive and expect the allocator to have placed it clear of
 // the space's ring and config page.
-void expect_l1_buffer_placed_clear_of(distributed::MeshDevice& mesh_device, const m2::PrefetcherPipeSpace& space) {
+void expect_l1_buffer_placed_clear_of(
+    distributed::MeshDevice& mesh_device, const experimental::PrefetcherPipeSpace& space) {
     constexpr uint32_t buffer_size = 2048;
     auto buffer = distributed::MeshBuffer::create(
         distributed::ReplicatedBufferConfig{.size = buffer_size},
@@ -366,7 +372,7 @@ void persistent_run_overlapping_programs(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device, Program first_program, Program second_program) {
     const bool fast_dispatch = MetalContext::instance().rtoptions().get_fast_dispatch();
     if (!fast_dispatch) {
-        m2::DispatchContext::get().enable_asynchronous_slow_dispatch(mesh_device.get());
+        experimental::DispatchContext::get().enable_asynchronous_slow_dispatch(mesh_device.get());
     }
     {
         const auto device_range = persistent_unit_mesh_device_range();
@@ -379,7 +385,7 @@ void persistent_run_overlapping_programs(
         distributed::Finish(mesh_device->mesh_command_queue());
     }
     if (!fast_dispatch) {
-        m2::DispatchContext::get().disable_asynchronous_slow_dispatch(mesh_device.get());
+        experimental::DispatchContext::get().disable_asynchronous_slow_dispatch(mesh_device.get());
     }
 }
 
@@ -390,7 +396,7 @@ void persistent_run_overlapping_programs(
 // does under real traffic, because it is the same credit path that moves it.
 void spin_pipe_credits(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t num_pushes) {
     const auto spin_kernel = [&](const std::string& name, uint32_t is_sender) {
@@ -417,7 +423,7 @@ void spin_pipe_credits(
 
 uint32_t run_persistent_sender_push(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t num_entries) {
     Program program = make_sender_program(
@@ -429,7 +435,7 @@ uint32_t run_persistent_sender_push(
 
 uint32_t run_persistent_receiver_pop(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t num_entries) {
     distributed::MeshDevice& device = *mesh_device;
@@ -448,7 +454,7 @@ uint32_t run_persistent_receiver_pop(
 // Returns the number of receivers whose ring holds the expected bytes.
 uint32_t run_persistent_1toN_cross_program(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t num_entries,
     uint32_t write_primitive,
@@ -507,7 +513,7 @@ uint32_t run_persistent_1toN_cross_program(
 // single-threaded, launched with num_threads > 1. APIs skip non-owned receivers.
 uint32_t run_persistent_mt_sender_partition_r(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t num_entries,
     uint32_t num_sender_threads,
@@ -584,7 +590,8 @@ struct RelayConsumerParams {
     uint32_t relay_pages_per_entry = 1;  // relay entries per pipe entry
 };
 
-RelayConsumerSpecs make_relay_consumer(std::vector<m2::PrefetcherPipeParamName> pipes, const RelayConsumerParams& p) {
+RelayConsumerSpecs make_relay_consumer(
+    std::vector<experimental::PrefetcherPipeParamName> pipes, const RelayConsumerParams& p) {
     const m2::DFBSpecName relay_name{"relay"};
     RelayConsumerSpecs c{
         .receiver = make_dm_kernel("receiver", relay_receiver_kernel_path, p.num_producers),
@@ -691,7 +698,7 @@ uint32_t verify_relay_results(
 // Returns number of receiver cores whose per-thread results match the expected pattern.
 uint32_t run_prefetcher_pipe_relay(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     const PrefetcherPipeRelayParams& params) {
     TT_FATAL(params.total_entries % params.batch_size == 0, "Relay test total_entries must be divisible by batch_size");
     TT_FATAL(params.ring_depth % params.batch_size == 0, "Relay test ring_depth must be divisible by batch_size");
@@ -862,7 +869,7 @@ uint32_t run_prefetcher_pipe_relay(
 // 1P1C relay with an optional receiver-side entry size that differs from the sender's.
 uint32_t run_prefetcher_pipe_relay_cross_program(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     uint32_t entry_size,
     uint32_t ring_depth,
     uint32_t total_entries,
@@ -895,7 +902,7 @@ struct ReceiverProgramSpecParams {
     m2::DFBAccessPattern cap = m2::DFBAccessPattern::STRIDED;
 };
 
-m2::ProgramSpec receiver_program_spec(const m2::PrefetcherPipe& pipe, const ReceiverProgramSpecParams& p) {
+m2::ProgramSpec receiver_program_spec(const experimental::PrefetcherPipe& pipe, const ReceiverProgramSpecParams& p) {
     const uint32_t ring_depth = pipe.ring_size() / p.entry_size;
     if (!p.with_relay) {
         return m2::ProgramSpec{
@@ -934,13 +941,14 @@ uint32_t slot_relay_word(const Program& program, const CoreCoord& core) {
 
 }  // namespace
 
-m2::PrefetcherPipe PrefetcherPipeFixture::make_pipe(
+experimental::PrefetcherPipe PrefetcherPipeFixture::make_pipe(
     distributed::MeshDevice* device,
     CoreCoord sender,
     const CoreRangeSet& receivers,
     uint32_t ring_size,
     uint32_t num_credit_lanes) {
-    spaces_.push_back(m2::CreatePrefetcherPipeSpace(*device, one_pipe_space_config(sender, receivers, ring_size)));
+    spaces_.push_back(
+        experimental::CreatePrefetcherPipeSpace(*device, one_pipe_space_config(sender, receivers, ring_size)));
     return spaces_.back().create_pipe(sender, receivers, num_credit_lanes);
 }
 
@@ -955,9 +963,9 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipeSpace_CarveRejects) {
     auto mesh_device = devices_[0];
     const CoreCoord sender(0, 0);
     const CoreRangeSet domain(CoreRange({1, 0}, {2, 0}));
-    auto space = m2::CreatePrefetcherPipeSpace(
+    auto space = experimental::CreatePrefetcherPipeSpace(
         *mesh_device,
-        m2::PrefetcherPipeSpaceConfig{
+        experimental::PrefetcherPipeSpaceConfig{
             .sender_cores = CoreRangeSet(CoreRange(sender)),
             .receiver_domain = domain,
             .ring_size = 1024,
@@ -1004,39 +1012,43 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipeSpace_ConfigRejects) {
         mutate(c);
         return c;
     };
-    EXPECT_THROW(m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.ring_size = 0; })), std::exception);
-    EXPECT_THROW(m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.ring_size = 33; })), std::exception);
     EXPECT_THROW(
-        m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.buffer_type = BufferType::DRAM; })),
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.ring_size = 0; })), std::exception);
+    EXPECT_THROW(
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.ring_size = 33; })), std::exception);
+    EXPECT_THROW(
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.buffer_type = BufferType::DRAM; })),
         std::exception);
     EXPECT_THROW(
-        m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.max_receivers_per_pipe = 0; })),
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.max_receivers_per_pipe = 0; })),
         std::exception);
     // A pipe cannot have more receivers than the domain it is carved from.
     EXPECT_THROW(
-        m2::CreatePrefetcherPipeSpace(
+        experimental::CreatePrefetcherPipeSpace(
             *mesh_device, with([](auto& c) { c.max_receivers_per_pipe = c.receiver_domain.num_cores() + 1; })),
         std::exception);
     // No receiver domain: nothing could ever be carved.
     EXPECT_THROW(
-        m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.receiver_domain = CoreRangeSet{}; })),
+        experimental::CreatePrefetcherPipeSpace(
+            *mesh_device, with([](auto& c) { c.receiver_domain = CoreRangeSet{}; })),
         std::exception);
     EXPECT_THROW(
-        m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) {
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) {
             c.sender_cores = CoreRangeSet{};
             c.receiver_domain = CoreRangeSet{};
         })),
         std::exception);
     // Worker and DRAM sender capacity may coexist; exact DRAM senders are selected later.
-    EXPECT_NO_THROW(m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.num_dram_senders = 1; })));
+    EXPECT_NO_THROW(
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) { c.num_dram_senders = 1; })));
     // DRAM senders take their worker L1 from the allocator, never from the persistent arena.
     EXPECT_THROW(
-        m2::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) {
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, with([](auto& c) {
             c.num_dram_senders = 1;
-            c.l1_source = m2::PrefetcherPipeL1Source::PersistentArena;
+            c.l1_source = experimental::PrefetcherPipeL1Source::PersistentArena;
         })),
         std::exception);
-    EXPECT_NO_THROW(m2::CreatePrefetcherPipeSpace(*mesh_device, config));
+    EXPECT_NO_THROW(experimental::CreatePrefetcherPipeSpace(*mesh_device, config));
 }
 
 TEST_F(PrefetcherPipeFixture, PrefetcherPipeSpace_PipesShareAddressesByContract) {
@@ -1045,9 +1057,9 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipeSpace_PipesShareAddressesByContract)
     }
     auto mesh_device = devices_[0];
     // One space over two disjoint sender/receiver pairs: both pipes sit at the space's addresses.
-    auto space = m2::CreatePrefetcherPipeSpace(
+    auto space = experimental::CreatePrefetcherPipeSpace(
         *mesh_device,
-        m2::PrefetcherPipeSpaceConfig{
+        experimental::PrefetcherPipeSpaceConfig{
             .sender_cores = CoreRangeSet(std::vector<CoreRange>{CoreRange({0, 0}), CoreRange({2, 0})}),
             .receiver_domain = CoreRangeSet(std::vector<CoreRange>{CoreRange({1, 0}), CoreRange({3, 0})}),
             .ring_size = 1024,
@@ -1086,9 +1098,9 @@ TEST_F(PrefetcherPipeFixture, MultipleDisjointOneToNPipesShareL1Address) {
 
     // M=3 independent 1:N pipes (N=2) carved from one space in one batch. Their cores are
     // disjoint, so every ring/config sits at the same per-core L1 address.
-    auto space = m2::CreatePrefetcherPipeSpace(
+    auto space = experimental::CreatePrefetcherPipeSpace(
         *mesh_device,
-        m2::PrefetcherPipeSpaceConfig{
+        experimental::PrefetcherPipeSpaceConfig{
             .sender_cores = CoreRangeSet(CoreRange({0, 0}, {0, 2})),
             .receiver_domain = CoreRangeSet(CoreRange({1, 0}, {2, 2})),
             .ring_size = ring_bytes,
@@ -1099,7 +1111,7 @@ TEST_F(PrefetcherPipeFixture, MultipleDisjointOneToNPipesShareL1Address) {
         {CoreCoord(0, 1), CoreRangeSet(CoreRange({1, 1}, {2, 1}))},
         {CoreCoord(0, 2), CoreRangeSet(CoreRange({1, 2}, {2, 2}))},
     };
-    std::vector<m2::PrefetcherPipe> pipes = space.create_pipes(mappings);
+    std::vector<experimental::PrefetcherPipe> pipes = space.create_pipes(mappings);
     ASSERT_EQ(pipes.size(), 3u);
     EXPECT_EQ(space.unclaimed_cores().num_cores(), 0u);
 
@@ -1120,22 +1132,22 @@ TEST_F(PrefetcherPipeFixture, PersistentArenaSerializesOverlappingSpacesAndReuse
     auto mesh_device = devices_[0];
     uint32_t first_ring_address = 0;
     uint32_t first_config_address = 0;
-    m2::PrefetcherPipeIdentity first_pipe_identity{0};
+    experimental::PrefetcherPipeIdentity first_pipe_identity{0};
     {
         // Spaces are scoped here rather than parked on the fixture: the replacement below can only
         // land back at the first addresses once both spaces have released their persistent L1.
         // Each space is declared before its pipe so the pipe dies first.
         const CoreRangeSet shared_receiver = CoreRangeSet(CoreRange({1, 0}));
-        auto space0 =
-            m2::CreatePrefetcherPipeSpace(*mesh_device, one_pipe_space_config(CoreCoord(0, 0), shared_receiver, 1024));
+        auto space0 = experimental::CreatePrefetcherPipeSpace(
+            *mesh_device, one_pipe_space_config(CoreCoord(0, 0), shared_receiver, 1024));
         auto pipe0 = space0.create_pipe(CoreCoord(0, 0), shared_receiver);
         first_ring_address = pipe0.buffer_address();
         first_config_address = pipe0.config_address();
         first_pipe_identity = pipe0.identity();
 
         // A second space sharing (1,0) cannot alias the first one's L1 there.
-        auto space1 =
-            m2::CreatePrefetcherPipeSpace(*mesh_device, one_pipe_space_config(CoreCoord(2, 0), shared_receiver, 1024));
+        auto space1 = experimental::CreatePrefetcherPipeSpace(
+            *mesh_device, one_pipe_space_config(CoreCoord(2, 0), shared_receiver, 1024));
         auto pipe1 = space1.create_pipe(CoreCoord(2, 0), shared_receiver);
         EXPECT_GE(pipe1.buffer_address(), pipe0.config_address() + pipe0.config_page_size());
     }
@@ -1153,9 +1165,12 @@ TEST_F(PrefetcherPipeFixture, DefaultL1SourceFollowsSenderType) {
     auto mesh_device = devices_[0];
     auto config = one_pipe_space_config(CoreCoord(0, 0), CoreRangeSet(CoreRange({1, 0})), 1024);
     EXPECT_EQ(
-        m2::CreatePrefetcherPipeSpace(*mesh_device, config).l1_source(), m2::PrefetcherPipeL1Source::PersistentArena);
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, config).l1_source(),
+        experimental::PrefetcherPipeL1Source::PersistentArena);
     config.num_dram_senders = 1;
-    EXPECT_EQ(m2::CreatePrefetcherPipeSpace(*mesh_device, config).l1_source(), m2::PrefetcherPipeL1Source::Allocator);
+    EXPECT_EQ(
+        experimental::CreatePrefetcherPipeSpace(*mesh_device, config).l1_source(),
+        experimental::PrefetcherPipeL1Source::Allocator);
 }
 
 TEST_F(PrefetcherPipeFixture, AllocatorSpaceTakesItsL1FromTheAllocator) {
@@ -1164,12 +1179,12 @@ TEST_F(PrefetcherPipeFixture, AllocatorSpaceTakesItsL1FromTheAllocator) {
     }
     auto mesh_device = devices_[0];
     auto config = one_pipe_space_config(CoreCoord(0, 0), CoreRangeSet(CoreRange({1, 0})), 1024);
-    config.l1_source = m2::PrefetcherPipeL1Source::Allocator;
+    config.l1_source = experimental::PrefetcherPipeL1Source::Allocator;
 
     uint32_t first_ring_address = 0;
     uint32_t first_config_address = 0;
     {
-        auto space = m2::CreatePrefetcherPipeSpace(*mesh_device, config);
+        auto space = experimental::CreatePrefetcherPipeSpace(*mesh_device, config);
         first_ring_address = space.buffer_address();
         first_config_address = space.config_address();
         EXPECT_EQ(space.config_address() % PREFETCHER_PIPE_CREDIT_BLOCK_ALIGN, 0u);
@@ -1180,7 +1195,7 @@ TEST_F(PrefetcherPipeFixture, AllocatorSpaceTakesItsL1FromTheAllocator) {
     }
 
     // Destroying the space handed its L1 back, so an identical space lands where it was.
-    auto space = m2::CreatePrefetcherPipeSpace(*mesh_device, config);
+    auto space = experimental::CreatePrefetcherPipeSpace(*mesh_device, config);
     EXPECT_EQ(space.buffer_address(), first_ring_address);
     EXPECT_EQ(space.config_address(), first_config_address);
 }
@@ -1201,11 +1216,11 @@ TEST_F(PrefetcherPipeFixture, AllocatorSpaceCanBeCreatedAfterProgramLocalL1) {
 
     // The live program's CB seals the persistent arena on the receivers.
     auto config = one_pipe_space_config(sender, receivers, entry_size * num_entries);
-    config.l1_source = m2::PrefetcherPipeL1Source::PersistentArena;
-    EXPECT_THROW(m2::CreatePrefetcherPipeSpace(*mesh_device, config), std::exception);
+    config.l1_source = experimental::PrefetcherPipeL1Source::PersistentArena;
+    EXPECT_THROW(experimental::CreatePrefetcherPipeSpace(*mesh_device, config), std::exception);
 
-    config.l1_source = m2::PrefetcherPipeL1Source::Allocator;
-    auto space = m2::CreatePrefetcherPipeSpace(*mesh_device, config);
+    config.l1_source = experimental::PrefetcherPipeL1Source::Allocator;
+    auto space = experimental::CreatePrefetcherPipeSpace(*mesh_device, config);
     auto pipe = space.create_pipe(sender, receivers);
     EXPECT_EQ(run_persistent_1toN_cross_program(mesh_device, pipe, entry_size, num_entries, /*write_primitive=*/0), 2u);
 }
@@ -1217,21 +1232,23 @@ TEST_F(PrefetcherPipeFixture, SpacesCreatedTogetherShareL1) {
     auto mesh_device = devices_[0];
     constexpr uint32_t entry_size = 256;
     constexpr uint32_t num_entries = 4;
-    std::vector<m2::PrefetcherPipeSpaceConfig> configs = {
+    std::vector<experimental::PrefetcherPipeSpaceConfig> configs = {
         one_pipe_space_config(CoreCoord(0, 0), CoreRangeSet(CoreRange({1, 0})), entry_size * num_entries),
         one_pipe_space_config(CoreCoord(2, 0), CoreRangeSet(CoreRange({3, 0})), entry_size * num_entries),
     };
     for (auto& config : configs) {
-        config.l1_source = m2::PrefetcherPipeL1Source::Allocator;
+        config.l1_source = experimental::PrefetcherPipeL1Source::Allocator;
     }
 
     // Spaces that share L1 addresses need disjoint cores and one source.
-    EXPECT_THROW(m2::CreatePrefetcherPipeSpaces(*mesh_device, std::vector{configs[0], configs[0]}), std::exception);
+    EXPECT_THROW(
+        experimental::CreatePrefetcherPipeSpaces(*mesh_device, std::vector{configs[0], configs[0]}), std::exception);
     auto mixed = configs;
-    mixed[1].l1_source = m2::PrefetcherPipeL1Source::PersistentArena;
-    EXPECT_THROW(m2::CreatePrefetcherPipeSpaces(*mesh_device, mixed), std::exception);
+    mixed[1].l1_source = experimental::PrefetcherPipeL1Source::PersistentArena;
+    EXPECT_THROW(experimental::CreatePrefetcherPipeSpaces(*mesh_device, mixed), std::exception);
 
-    std::vector<m2::PrefetcherPipeSpace> spaces = m2::CreatePrefetcherPipeSpaces(*mesh_device, configs);
+    std::vector<experimental::PrefetcherPipeSpace> spaces =
+        experimental::CreatePrefetcherPipeSpaces(*mesh_device, configs);
     ASSERT_EQ(spaces.size(), 2u);
     EXPECT_EQ(spaces[0].buffer_address(), spaces[1].buffer_address());
     EXPECT_EQ(spaces[0].config_address(), spaces[1].config_address());
@@ -1306,8 +1323,8 @@ TEST_F(PrefetcherPipeFixture, ProgramSpec_AssignsDistinctSlotsPerAccessor) {
     auto mesh_device = devices_[0];
     auto pipe0 = make_pipe(mesh_device.get(), CoreCoord(0, 0), CoreRangeSet(CoreRange({1, 0})), 1024);
     auto pipe1 = make_pipe(mesh_device.get(), CoreCoord(0, 1), CoreRangeSet(CoreRange({1, 1})), 1024);
-    const m2::PrefetcherPipeParamName name0{"p0"};
-    const m2::PrefetcherPipeParamName name1{"p1"};
+    const experimental::PrefetcherPipeParamName name0{"p0"};
+    const experimental::PrefetcherPipeParamName name1{"p1"};
 
     // Two sender kernels, each binding its own pipe: two slots, id 0 and 1 in kernel order.
     m2::KernelSpec sender0 = make_dm_kernel("sender0", blank_kernel_path);
@@ -2998,7 +3015,7 @@ bool poll_sem_set(distributed::MeshDevice& mesh_device, const CoreCoord& core, u
 // grid point at or after that offset.
 bool run_coordinated_resize(
     const std::shared_ptr<distributed::MeshDevice>& mesh_device,
-    m2::PrefetcherPipe& pipe,
+    experimental::PrefetcherPipe& pipe,
     const GlobalSemaphore& resized_sem,
     const GlobalSemaphore& go_sem,
     uint32_t e1,
@@ -3279,26 +3296,26 @@ TEST_F(PrefetcherPipeFixture, PrefetcherPipe_MultiPipeAccessor_CrossProgram_2S2R
     const CoreRangeSet sender_cores(CoreRange(sender_a, sender_b));
     const CoreRangeSet receiver_cores(CoreRange(receiver_a, receiver_b));
 
-    auto space = m2::CreatePrefetcherPipeSpace(
+    auto space = experimental::CreatePrefetcherPipeSpace(
         *mesh_device,
-        m2::PrefetcherPipeSpaceConfig{
+        experimental::PrefetcherPipeSpaceConfig{
             .sender_cores = sender_cores,
             .receiver_domain = receiver_cores,
             .ring_size = ring_size,
             .max_receivers_per_pipe = 1,
         });
     const std::vector<std::pair<CoreCoord, CoreRangeSet>> mappings = {{sender_a, receivers_a}, {sender_b, receivers_b}};
-    std::vector<m2::PrefetcherPipe> pipes = space.create_pipes(mappings);
+    std::vector<experimental::PrefetcherPipe> pipes = space.create_pipes(mappings);
     ASSERT_EQ(pipes.size(), 2u);
-    m2::PrefetcherPipe& pipe_a = pipes[0];
-    m2::PrefetcherPipe& pipe_b = pipes[1];
+    experimental::PrefetcherPipe& pipe_a = pipes[0];
+    experimental::PrefetcherPipe& pipe_b = pipes[1];
     ASSERT_EQ(pipe_a.buffer_address(), pipe_b.buffer_address());
     auto result_buffer = cross_node_dfb_test::make_cross_node_data_buffer(device, receiver_cores, 32, 1);
     const uint32_t result_addr = static_cast<uint32_t>(result_buffer->address());
 
-    const m2::PrefetcherPipeParamName name_a{"a"};
-    const m2::PrefetcherPipeParamName name_b{"b"};
-    const std::vector<m2::PrefetcherPipeParameter> pipe_params = {
+    const experimental::PrefetcherPipeParamName name_a{"a"};
+    const experimental::PrefetcherPipeParamName name_b{"b"};
+    const std::vector<experimental::PrefetcherPipeParameter> pipe_params = {
         pipe_parameter(name_a, pipe_a, entry_size),
         pipe_parameter(name_b, pipe_b, entry_size),
     };

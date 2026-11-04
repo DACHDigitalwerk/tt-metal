@@ -8,7 +8,7 @@
 #include <tt-metalium/mesh_device.hpp>
 #include <tt-metalium/program.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
+#include <tt-metalium/workload/specification/program_spec.hpp>
 #include <tt_stl/fmt.hpp>
 
 #include "distributed/mesh_device_impl.hpp"
@@ -19,7 +19,7 @@
 #include "impl/metal2_host_api/program_spec/validation/validate_spec.hpp"
 #include "impl/program/program_impl.hpp"
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 Program BuildProgramFromSpec(distributed::MeshDevice& mesh_device, const ProgramSpec& spec, bool skip_validation) {
     log_debug(tt::LogMetal, "Creating Program from ProgramSpec ({})", spec.name);
@@ -76,4 +76,4 @@ distributed::MeshWorkload MakeMeshWorkloadFromSpec(
     return workload;
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

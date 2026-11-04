@@ -32,8 +32,8 @@
 #include <tt-metalium/experimental/dispatch_context.hpp>
 #include <tt-metalium/experimental/prefetcher_pipe.hpp>
 #include <tt-metalium/experimental/metal2_host_api/program.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_run_args.hpp>
-#include <tt-metalium/experimental/metal2_host_api/program_spec.hpp>
+#include <tt-metalium/workload/run_args/program_run_args.hpp>
+#include <tt-metalium/workload/specification/program_spec.hpp>
 #include <tt-metalium/host_api.hpp>
 #include <tt-metalium/program.hpp>
 #include <tt-metalium/math.hpp>
@@ -196,7 +196,7 @@ void run_push_and_pop(
     distributed::MeshDevice& mesh_device, PipeSet& set, uint32_t num_entries, uint32_t entry_size = kEntrySize) {
     std::vector<experimental::PrefetcherPipeParamName> pipe_names;
     std::vector<experimental::PrefetcherPipeParameter> pipe_parameters;
-    experimental::ProgramRunArgs run_args;
+    ProgramRunArgs run_args;
     for (size_t s = 0; s < set.pipes.size(); ++s) {
         experimental::PrefetcherPipeParamName name{fmt::format("pipe_{}", s)};
         pipe_names.push_back(name);
@@ -205,26 +205,24 @@ void run_push_and_pop(
             .receivers = set.pipes[s].receiver_cores(),
             .ring_size = set.pipes[s].ring_size(),
             .entry_size = entry_size});
-        run_args.advanced_options.prefetcher_pipe_args.emplace(
-            name, experimental::PrefetcherPipeArgument{set.pipes[s]});
+        run_args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{set.pipes[s]});
     }
-    experimental::KernelSpec receiver{
-        .unique_id = experimental::KernelSpecName{"receiver"}, .source = std::filesystem::path{kReceiverKernel}};
+    KernelSpec receiver{.unique_id = KernelSpecName{"receiver"}, .source = std::filesystem::path{kReceiverKernel}};
     receiver.advanced_options.prefetcher_pipe_bindings = {{.pipe_parameter_names = pipe_names, .accessor_name = "in"}};
     receiver.compile_time_args = {{"num_entries", num_entries}};
-    receiver.hw_config = experimental::DataMovementHardwareConfig{
-        .config_1xx = experimental::DataMovementHardwareConfig::DataMovement1XXConfig{
+    receiver.hw_config = DataMovementHardwareConfig{
+        .config_1xx = DataMovementHardwareConfig::DataMovement1XXConfig{
             .processor = DataMovementProcessor::RISCV_0, .noc = NOC::NOC_0}};
-    experimental::ProgramSpec spec{
+    ProgramSpec spec{
         .name = "dram_sender_pipe_receiver",
         .kernels = {std::move(receiver)},
         .work_units =
             {{.name = "receiver_wu",
-              .kernels = {experimental::KernelSpecName{"receiver"}},
+              .kernels = {KernelSpecName{"receiver"}},
               .target_nodes = experimental::GetPrefetcherPipeReceiverCores(set.pipe_refs())}},
         .advanced_options = {.prefetcher_pipe_parameters = std::move(pipe_parameters)}};
-    Program receiver_program = experimental::MakeProgramFromSpec(mesh_device, spec);
-    experimental::SetProgramRunArgs(receiver_program, run_args);
+    Program receiver_program = MakeProgramFromSpec(mesh_device, spec);
+    SetProgramRunArgs(receiver_program, run_args);
 
     const uint32_t pattern_base = static_cast<uint32_t>(drisc_pattern_base(mesh_device));
     Program sender_program = CreateProgram(mesh_device);
@@ -635,30 +633,27 @@ TEST_F(PrefetcherPipeDramSenderFixture, BindingAcceptsAnyEntrySizeTheRingHolds) 
 
     const auto make_consumer = [&](uint32_t entry_size) {
         const experimental::PrefetcherPipeParamName name{"pipe"};
-        experimental::KernelSpec receiver{
-            .unique_id = experimental::KernelSpecName{"receiver"}, .source = std::filesystem::path{kReceiverKernel}};
+        KernelSpec receiver{.unique_id = KernelSpecName{"receiver"}, .source = std::filesystem::path{kReceiverKernel}};
         receiver.advanced_options.prefetcher_pipe_bindings = {{{name}, "in"}};
         receiver.compile_time_args = {{"num_entries", 1u}};
-        receiver.hw_config = experimental::DataMovementHardwareConfig{
-            .config_1xx = experimental::DataMovementHardwareConfig::DataMovement1XXConfig{
+        receiver.hw_config = DataMovementHardwareConfig{
+            .config_1xx = DataMovementHardwareConfig::DataMovement1XXConfig{
                 .processor = DataMovementProcessor::RISCV_0, .noc = NOC::NOC_0}};
-        experimental::ProgramSpec spec{
+        ProgramSpec spec{
             .name = "entry_size_consumer",
             .kernels = {std::move(receiver)},
             .work_units =
-                {{.name = "receiver_wu",
-                  .kernels = {experimental::KernelSpecName{"receiver"}},
-                  .target_nodes = receiver_cores}},
+                {{.name = "receiver_wu", .kernels = {KernelSpecName{"receiver"}}, .target_nodes = receiver_cores}},
             .advanced_options = {
                 .prefetcher_pipe_parameters = {
                     {.unique_id = name,
                      .receivers = receiver_cores,
                      .ring_size = ring_size,
                      .entry_size = entry_size}}}};
-        Program program = experimental::MakeProgramFromSpec(*mesh_device_, spec);
-        experimental::ProgramRunArgs args;
-        args.advanced_options.prefetcher_pipe_args.emplace(name, experimental::PrefetcherPipeArgument{set.pipes[0]});
-        experimental::SetProgramRunArgs(program, args);
+        Program program = MakeProgramFromSpec(*mesh_device_, spec);
+        ProgramRunArgs args;
+        args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{set.pipes[0]});
+        SetProgramRunArgs(program, args);
     };
     // L1-aligned and well inside the ring, so only a divisibility rule could have rejected it.
     constexpr uint32_t kRingIndivisibleEntrySize = 48;

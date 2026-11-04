@@ -14,14 +14,14 @@
 #include <variant>
 #include <vector>
 
-#include <tt-metalium/experimental/metal2_host_api/node_coord.hpp>
+#include <tt-metalium/vocabulary/node_coord.hpp>
 #include <tt-metalium/experimental/metal2_host_api/advanced_options.hpp>
-#include <tt-metalium/experimental/metal2_host_api/dataflow_buffer_spec.hpp>
-#include <tt-metalium/experimental/metal2_host_api/data_movement_hardware_config.hpp>
+#include <tt-metalium/workload/specification/dataflow_buffer_spec.hpp>
+#include <tt-metalium/workload/specification/data_movement_hardware_config.hpp>
 
 #include "llrt/hal.hpp"
 
-namespace tt::tt_metal::experimental {
+namespace tt::tt_metal {
 
 // ============================================================================
 // Constants
@@ -184,4 +184,4 @@ inline bool DmKernelDisablesImplicitSync(const DataMovementHardwareConfig& dm_co
     return std::find(vec.begin(), vec.end(), dfb_name) != vec.end();
 }
 
-}  // namespace tt::tt_metal::experimental
+}  // namespace tt::tt_metal

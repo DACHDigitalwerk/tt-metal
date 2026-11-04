@@ -325,7 +325,7 @@ bool initialize_program(
     tt_metal::Program& program,
     uint32_t run_cycles,
     PrefetcherPipes* prefetcher_pipes) {
-    namespace m2 = tt::tt_metal::experimental;
+    namespace m2 = tt::tt_metal;
     TT_FATAL(get_num_kernels(info) != 0, "The program needs a kernel; enable BRISC, NCRISC, or TRISC");
     TT_FATAL(
         prefetcher_pipes == nullptr || (info.brisc_enabled && info.n_kgs == 1 && info.n_subdevice_ranges == 1),

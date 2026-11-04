@@ -18,7 +18,7 @@
 #include "api/tt-metalium/device.hpp"
 #include "impl/host_api/temp_quasar_api.hpp"
 #include "api/tt-metalium/experimental/offline_kernel_compile.hpp"
-#include <tt-metalium/experimental/metal2_host_api/scratchpad_spec.hpp>
+#include <tt-metalium/workload/specification/scratchpad_spec.hpp>
 #include "impl/context/metal_context.hpp"
 #include "core_coord.hpp"
 #include "hal_types.hpp"
@@ -192,8 +192,8 @@ struct ScratchpadBindingHandle {
     // as the build artifact of 2 kernels with/without shared allocation is the same.
     //
     // The ScratchpadSpecName serves as an identifier & does not carry specific meaning.
-    using AllocationIdentifier = experimental::ScratchpadSpecName;
-    std::optional<experimental::ScratchpadSpecName> shared_allocation_identifier;
+    using AllocationIdentifier = ScratchpadSpecName;
+    std::optional<ScratchpadSpecName> shared_allocation_identifier;
 };
 
 // Metal 2.0: per-kernel resolved PrefetcherPipe accessor (KernelAdvancedOptions::PrefetcherPipeBinding).
