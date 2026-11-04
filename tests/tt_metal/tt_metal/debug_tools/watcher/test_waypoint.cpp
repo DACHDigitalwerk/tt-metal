@@ -145,8 +145,8 @@ void RunTest(MeshWatcherFixture* fixture, const std::shared_ptr<distributed::Mes
         .kernels = kernel_specs,
         .work_units = {wu},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
-    SetProgramRunArgs(program, params);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
     workload.add_program(device_range, std::move(program));
 
     // Dispatch non-blocking: kernels post waypoint then spin on sync flag

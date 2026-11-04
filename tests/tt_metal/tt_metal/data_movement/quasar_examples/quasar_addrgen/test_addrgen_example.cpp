@@ -57,11 +57,11 @@ bool run_addrgen_test(
         .kernels = {dm_kernel_spec},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{.kernel = DM_KERNEL}};
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     distributed::MeshWorkload workload;
     distributed::MeshCoordinateRange device_range(mesh_device->shape());

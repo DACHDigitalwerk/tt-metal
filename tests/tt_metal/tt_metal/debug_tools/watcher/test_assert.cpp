@@ -146,7 +146,7 @@ static void RunTest(
                 .kernels = {assert_kernel_spec},
                 .work_units = {wu},
             };
-            program = MakeProgramFromSpec(*mesh_device, spec);
+            program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
             break;
         }
         case HalProgrammableCoreType::ACTIVE_ETH:
@@ -231,7 +231,7 @@ static void RunTest(
                         {"hw_assert_cause", args[3]},
                     }),
             }};
-            SetProgramRunArgs(prog, params);
+            tt_metal::experimental::SetProgramRunArgs(prog, params);
         }
     };
 

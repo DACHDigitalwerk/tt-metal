@@ -165,7 +165,8 @@ void ValidateLegacyRuntimeArgsAPI(const Program& program, std::string_view api_n
     TT_FATAL(
         !program.impl().has_metal2_registry(),
         "{} cannot be used with a Program created from a Metal 2.0 ProgramSpec. "
-        "Use tt::tt_metal::SetProgramRunArgs or tt::tt_metal::UpdateProgramRunArgs instead.",
+        "Use tt::tt_metal::experimental::SetProgramRunArgs or tt::tt_metal::experimental::UpdateProgramRunArgs "
+        "instead.",
         api_name);
 }
 

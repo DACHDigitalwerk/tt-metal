@@ -112,7 +112,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, DmLoopback) {
         .semaphores = {sem},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(this->device(), spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(this->device(), spec);
 
     const KernelSpecName dram_to_l1_names[] = {DRAM_TO_L1_0, DRAM_TO_L1_1, DRAM_TO_L1_2};
     const KernelSpecName l1_to_dram_names[] = {L1_TO_DRAM_0, L1_TO_DRAM_1, L1_TO_DRAM_2};
@@ -144,7 +144,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, DmLoopback) {
         l1_address += sizeof(uint32_t);
         signal_value++;
     }
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(this->device(), std::move(program));
 

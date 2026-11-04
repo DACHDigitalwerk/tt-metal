@@ -89,7 +89,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, MultiDmAddTwoInts) {
         .kernels = {k0, k1, k2, k3},
         .work_units = {wu_core0, wu_core1},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -110,7 +110,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, MultiDmAddTwoInts) {
             .kernel = KERNEL_3,
             .runtime_arg_values = MakeRuntimeArgsForSingleNode(NodeCoord{1, 0}, {{"a", 7}, {"b", 8}})},
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     distributed::EnqueueMeshWorkload(cq, workload, true);

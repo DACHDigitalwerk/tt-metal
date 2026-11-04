@@ -117,8 +117,8 @@ protected:
 
         WorkUnitSpec main_wu{.name = "main", .kernels = kernel_names, .target_nodes = core};
         ProgramSpec spec{.name = "noc_atomic_ops", .kernels = kernel_specs, .work_units = {main_wu}};
-        program = MakeProgramFromSpec(*mesh_device_, spec);
-        SetProgramRunArgs(program, params);
+        program = experimental::MakeProgramFromSpec(*mesh_device_, spec);
+        experimental::SetProgramRunArgs(program, params);
         workload.add_program(device_range, std::move(program));
         RunProgram(mesh_device_, workload);
 

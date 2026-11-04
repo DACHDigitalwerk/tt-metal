@@ -114,9 +114,9 @@ void RunFillUpAllBuffers(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
     ProgramRunArgs params;  // kernels take no runtime args
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     // One enqueue is enough to fill the L1 profiler buffer on Quasar

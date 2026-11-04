@@ -224,7 +224,7 @@ void run_single_core_cumsum(distributed::MeshDevice& mesh_device, const CumsumCo
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {reader_run_args, writer_run_args, {.kernel = COMPUTE}};
@@ -232,7 +232,7 @@ void run_single_core_cumsum(distributed::MeshDevice& mesh_device, const CumsumCo
         {IN_TENSOR, ProgramRunArgs::TensorArgument{in_tensor}},
         {OUT_TENSOR, ProgramRunArgs::TensorArgument{out_tensor}},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     // Fixed seed so a failure reproduces across runs.
     constexpr uint32_t kRandomSeed = 0x1234;

@@ -136,8 +136,8 @@ DramPrefetcherConsumerDeviceOperation::ProgramFactory::create_at(
             .work_units =
                 {{.name = "receiver_wu", .kernels = {KernelSpecName{"receiver"}}, .target_nodes = receiver_cores}},
             .advanced_options = {.prefetcher_pipe_parameters = std::move(parameters)}};
-        program = MakeProgramFromSpec(*operation_attributes.mesh_device, spec);
-        SetProgramRunArgs(program, run_args);
+        program = metal_exp::MakeProgramFromSpec(*operation_attributes.mesh_device, spec);
+        metal_exp::SetProgramRunArgs(program, run_args);
         return {std::move(program), shared_variables_t{}};
     }
 
@@ -180,7 +180,7 @@ void DramPrefetcherConsumerDeviceOperation::ProgramFactory::override_runtime_arg
             pipe_param_name(i), tt::tt_metal::PrefetcherPipeArgument{*operation_attributes.prefetcher_pipes[i]});
     }
     for (auto& [coordinate_range, program] : cached_workload.workload.get_programs()) {
-        tt::tt_metal::UpdateProgramRunArgs(program, run_args);
+        metal_exp::UpdateProgramRunArgs(program, run_args);
     }
 }
 

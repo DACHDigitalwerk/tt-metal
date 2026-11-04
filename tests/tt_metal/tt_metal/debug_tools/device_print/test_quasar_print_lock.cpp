@@ -81,11 +81,11 @@ protected:
         }
         WorkUnitSpec main_wu{.name = "main", .kernels = {name}, .target_nodes = core};
         ProgramSpec spec{.name = "quasar_print_lock", .kernels = {kernel_spec}, .work_units = {main_wu}};
-        Program program = MakeProgramFromSpec(*mesh_device_, spec);
+        Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device_, spec);
         ProgramRunArgs params;
         params.kernel_run_args.push_back(ProgramRunArgs::KernelRunArgs{
             .kernel = name, .runtime_arg_values = MakeRuntimeArgsForSingleNode(core, args)});
-        SetProgramRunArgs(program, params);
+        tt_metal::experimental::SetProgramRunArgs(program, params);
 
         distributed::MeshWorkload workload;
         distributed::MeshCoordinate zero_coord{0, 0};

@@ -522,7 +522,7 @@ bool single_core_unpack_reconfig_quasar(const std::shared_ptr<distributed::MeshD
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     // Random stimulus: U(0, 1) per element (keep magnitudes small so matmul output
     // stays in a sensible bfloat16 range; each output element is sum of 32 products).
@@ -632,7 +632,7 @@ bool single_core_unpack_reconfig_quasar(const std::shared_ptr<distributed::MeshD
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(*mesh_device, std::move(program));
 
@@ -877,7 +877,7 @@ bool single_core_pack_reconfig_quasar(const std::shared_ptr<distributed::MeshDev
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     constexpr int kRandMax = 1;
     constexpr std::uint32_t elems_per_tile = tt::constants::TILE_HW;
@@ -1003,7 +1003,7 @@ bool single_core_pack_reconfig_quasar(const std::shared_ptr<distributed::MeshDev
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(*mesh_device, std::move(program));
 

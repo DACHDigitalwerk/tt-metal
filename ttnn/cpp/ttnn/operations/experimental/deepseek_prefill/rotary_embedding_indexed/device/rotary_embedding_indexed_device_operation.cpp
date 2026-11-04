@@ -821,8 +821,8 @@ RotaryEmbeddingIndexedDeviceOperation::MeshWorkloadFactory::create_at(
     }
     run_args.tensor_args.emplace(CONCAT_PREFIX_PARAM, TensorArgument{prefix});
 
-    auto program = MakeProgramFromSpec(*mesh_device, spec);
-    SetProgramRunArgs(program, run_args);
+    auto program = tt::tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
+    tt::tt_metal::experimental::SetProgramRunArgs(program, run_args);
     return {std::move(program), SharedVariables{}};
 }
 
@@ -878,7 +878,7 @@ void RotaryEmbeddingIndexedDeviceOperation::MeshWorkloadFactory::override_runtim
     // the same spec/name checks. Validation still runs on every invocation, including fresh metadata.
     bool validated = false;
     for (auto& [coordinate_range, program] : cached_workload.workload.get_programs()) {
-        UpdateProgramRunArgs(program, run_args, /*skip_validation=*/validated);
+        tt::tt_metal::experimental::UpdateProgramRunArgs(program, run_args, /*skip_validation=*/validated);
         validated = true;
     }
 }

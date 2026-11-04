@@ -63,7 +63,7 @@ int main() {
             .kernels = {dram_copy_kernel},
             .work_units = {wu},
         };
-        Program program = MakeProgramFromSpec(*mesh_device, spec);
+        Program program = tt::tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
         // boilerplate setup for reading and writing multiple tiles from DRAM
         constexpr uint32_t single_tile_size = 2 * (32 * 32);
@@ -100,7 +100,7 @@ int main() {
                            output_bank_id,
                            static_cast<uint32_t>(l1_buffer->size())}}}},
         });
-        SetProgramRunArgs(program, params);
+        tt::tt_metal::experimental::SetProgramRunArgs(program, params);
 
         workload.add_program(device_range, std::move(program));
         distributed::EnqueueMeshWorkload(cq, workload, false);

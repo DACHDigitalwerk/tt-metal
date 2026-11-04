@@ -134,8 +134,9 @@ MeshPartitionDeviceOperation::MeshPartition::create_at(
         [&](auto&& factory) -> Program {
             using Factory = std::decay_t<decltype(factory)>;
             auto artifacts = Factory::create_program_artifacts(slice_attrs, slice_tensor_args, tensor_return_value);
-            Program p = tt::tt_metal::MakeProgramFromSpec(*tensor_args.input_tensor.device(), artifacts.spec);
-            tt::tt_metal::SetProgramRunArgs(p, artifacts.run_params);
+            Program p =
+                tt::tt_metal::experimental::MakeProgramFromSpec(*tensor_args.input_tensor.device(), artifacts.spec);
+            tt::tt_metal::experimental::SetProgramRunArgs(p, artifacts.run_params);
             return p;
         },
         program_factory);
@@ -157,7 +158,7 @@ void MeshPartitionDeviceOperation::MeshPartition::override_runtime_arguments(
     // All coordinate programs declare the same tensor specs. Validate fresh buffers once per call.
     bool validated = false;
     for (auto& [range, program] : cached_workload.workload.get_programs()) {
-        tt::tt_metal::UpdateTensorArgs(program, bindings, /*skip_validation=*/validated);
+        tt::tt_metal::experimental::UpdateTensorArgs(program, bindings, /*skip_validation=*/validated);
         validated = true;
     }
 }

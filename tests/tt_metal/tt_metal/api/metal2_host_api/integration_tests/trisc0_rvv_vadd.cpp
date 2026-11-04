@@ -74,14 +74,14 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, Trisc0RvvVectorAdd) {
         .work_units = {main_wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = COMPUTE_KERNEL,
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"l1_address", l1_address}}),
     }};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     distributed::EnqueueMeshWorkload(cq, workload, true);

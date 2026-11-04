@@ -427,7 +427,7 @@ void run_single_core_broadcast(distributed::MeshDevice& mesh_device, const Broad
         .work_units = {wu},
     };
 
-    Program built_program = MakeProgramFromSpec(mesh_device, spec);
+    Program built_program = experimental::MakeProgramFromSpec(mesh_device, spec);
     workload.add_program(device_range, std::move(built_program));
     auto& program_run = workload.get_programs().at(device_range);
 
@@ -453,7 +453,7 @@ void run_single_core_broadcast(distributed::MeshDevice& mesh_device, const Broad
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program_run, params);
+    experimental::SetProgramRunArgs(program_run, params);
 
     std::vector<bfloat16> input0 = generate_uniform_random_vector<bfloat16>(
         -1.0f, 1.0f, single_tile_size / sizeof(bfloat16), std::chrono::system_clock::now().time_since_epoch().count());
@@ -672,7 +672,7 @@ void run_sub_bcast_col_custom(distributed::MeshDevice& mesh_device, const SubBca
         .work_units = {wu},
     };
 
-    Program built_program = MakeProgramFromSpec(mesh_device, spec);
+    Program built_program = experimental::MakeProgramFromSpec(mesh_device, spec);
     workload.add_program(device_range, std::move(built_program));
     auto& program_run = workload.get_programs().at(device_range);
 
@@ -700,7 +700,7 @@ void run_sub_bcast_col_custom(distributed::MeshDevice& mesh_device, const SubBca
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program_run, params);
+    experimental::SetProgramRunArgs(program_run, params);
 
     const std::uint32_t tile_elems = tile_height * tile_width;
     // Row-major host geometry of the srcA / output tile grid, and of the srcB tile column.

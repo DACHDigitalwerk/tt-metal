@@ -15,11 +15,11 @@
 
 #include <unordered_map>
 
-namespace tt::tt_metal {
+namespace tt::tt_metal::experimental {
 
 //------------------------------------------------
 // Temporary Metal 2.0 APIs
-// (temporary free functions)
+// (experimental namespace free functions)
 //------------------------------------------------
 
 // Create a Program object from a ProgramSpec
@@ -113,7 +113,7 @@ void UpdateTensorArgs(
     const Table<TensorParamName, ProgramRunArgs::TensorArgument>& tensor_args,
     bool skip_validation = false);
 
-}  // namespace tt::tt_metal
+}  // namespace tt::tt_metal::experimental
 
 // The code below is not compiled!
 // This is a placeholder for the "post-experimental" desired Program object semantics.

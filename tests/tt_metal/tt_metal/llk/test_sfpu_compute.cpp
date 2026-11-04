@@ -2158,7 +2158,7 @@ std::vector<uint32_t> run_sfpu_pipeline(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -2180,7 +2180,7 @@ std::vector<uint32_t> run_sfpu_pipeline(
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     distributed::EnqueueWriteMeshBuffer(cq, input_dram_buffer, packed_input, /*blocking=*/true);
     LaunchProgram(mesh_device, std::move(program));
@@ -2678,8 +2678,8 @@ std::vector<uint32_t> sfpu_quasar_run(
     const ProgramRunArgs& params,
     const std::vector<std::pair<std::shared_ptr<distributed::MeshBuffer>, const std::vector<uint32_t>*>>& inputs,
     const std::shared_ptr<distributed::MeshBuffer>& out_buf) {
-    auto program = MakeProgramFromSpec(mesh_device, spec);
-    SetProgramRunArgs(program, params);
+    auto program = experimental::MakeProgramFromSpec(mesh_device, spec);
+    experimental::SetProgramRunArgs(program, params);
     for (const auto& [buf, data] : inputs) {
         slow_dispatch::WriteToBuffer(*buf, *data);
     }

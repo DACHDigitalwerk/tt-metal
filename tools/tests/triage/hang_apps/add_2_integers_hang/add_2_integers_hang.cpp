@@ -174,7 +174,7 @@ int main() {
 
     // A MeshWorkload is a collection of programs that are executed on a MeshDevice. Building it from the ProgramSpec
     // compiles the kernels; the specific physical devices the workload runs on are determined by the mesh shape.
-    distributed::MeshWorkload workload = MakeMeshWorkloadFromSpec(*mesh_device, spec);
+    distributed::MeshWorkload workload = tt_metal::experimental::MakeMeshWorkloadFromSpec(*mesh_device, spec);
     Program& program = workload.get_programs().begin()->second;
 
     // Bind the tensors the kernels operate on. The reader and writer get their buffer addresses from these tensor
@@ -194,7 +194,7 @@ int main() {
         {IN1_T, TensorArgument{src1_tensor}},
         {OUT_T, TensorArgument{dst_tensor}},
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     // Create the data that will be used as input to the kernels.
     // src0 is a vector of bfloat16 values initialized to random values between 0.0f and 14.0f.

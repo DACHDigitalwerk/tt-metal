@@ -119,7 +119,7 @@ inline std::vector<std::uint32_t> run(distributed::MeshDevice& mesh_device, cons
     wu.kernels.push_back(COMPUTE);
     spec.work_units = {wu};
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     auto& cq = mesh_device.mesh_command_queue();
     ProgramRunArgs params;
@@ -146,7 +146,7 @@ inline std::vector<std::uint32_t> run(distributed::MeshDevice& mesh_device, cons
              {"dram_page_stride", out_tile_size}}),
     });
     params.kernel_run_args.push_back({.kernel = COMPUTE});
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(mesh_device, std::move(program));
 

@@ -123,7 +123,7 @@ void RunTest(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
     workload.add_program(device_range, std::move(program));
 
     distributed::EnqueueMeshWorkload(mesh_device->mesh_command_queue(), workload, false);

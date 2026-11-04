@@ -419,7 +419,7 @@ void run_single_core_unary_broadcast_quasar(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -435,7 +435,7 @@ void run_single_core_unary_broadcast_quasar(
     params.tensor_args = {
         {IN_TENSOR, ProgramRunArgs::TensorArgument{in_tensor}},
         {OUT_TENSOR, ProgramRunArgs::TensorArgument{out_tensor}}};
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     std::vector<std::uint32_t> packed_tilized_input;
     std::vector<std::uint32_t> golden_packed_tilized_output;

@@ -48,14 +48,14 @@ void RunTriscIrqMretAliasTest(
     };
     WorkUnitSpec work_unit{.name = "main", .kernels = {kernel}, .target_nodes = node};
     ProgramSpec spec{.name = "trisc_irq_mret_alias", .kernels = {kernel_spec}, .work_units = {work_unit}};
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = kernel,
         .runtime_arg_values =
             MakeRuntimeArgsForSingleNode(node, {{"scratch", scratch}, {"scratch_bytes", scratch_bytes}}),
     }};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
     distributed::MeshWorkload workload;
     workload.add_program(distributed::MeshCoordinateRange(mesh_device->shape()), std::move(program));
     fixture->RunProgramExpectingWatcherError(mesh_device, workload);

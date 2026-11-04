@@ -115,9 +115,9 @@ bool RunCustomCycle(const std::shared_ptr<distributed::MeshDevice>& mesh_device,
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
     ProgramRunArgs params;  // kernels take no runtime args
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     distributed::EnqueueMeshWorkload(mesh_device->mesh_command_queue(), workload, true);

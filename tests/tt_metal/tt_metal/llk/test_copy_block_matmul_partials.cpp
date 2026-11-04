@@ -226,7 +226,7 @@ void run_single_core_copy_block_matmul_partials(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     distributed::MeshWorkload workload;
     auto device_range = distributed::MeshCoordinateRange(zero_coord, zero_coord);
@@ -260,7 +260,7 @@ void run_single_core_copy_block_matmul_partials(
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program_run, params);
+    experimental::SetProgramRunArgs(program_run, params);
 
     distributed::EnqueueMeshWorkload(cq, workload, false);
     distributed::Finish(cq);

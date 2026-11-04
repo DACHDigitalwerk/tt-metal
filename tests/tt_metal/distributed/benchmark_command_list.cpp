@@ -123,7 +123,7 @@ BenchList make_list(MeshDevice& mesh_device, bool tensor, uint32_t num_programs,
         if (tensor) {
             spec.tensor_parameters = {m2::TensorParameter{.unique_id = m2::TensorParamName{"io"}, .spec = tensor_spec}};
         }
-        auto workload = m2::MakeMeshWorkloadFromSpec(mesh_device, spec);
+        auto workload = MakeMeshWorkloadFromSpec(mesh_device, spec);
         auto& program = workload.get_programs().begin()->second;
 
         m2::ProgramRunArgs::KernelRunArgs kernel_args{
@@ -139,7 +139,7 @@ BenchList make_list(MeshDevice& mesh_device, bool tensor, uint32_t num_programs,
             }
         }
         args.kernel_run_args = {kernel_args};
-        m2::SetProgramRunArgs(program, args);
+        SetProgramRunArgs(program, args);
 
         CmdListParameters parameters;
         if (tensor) {

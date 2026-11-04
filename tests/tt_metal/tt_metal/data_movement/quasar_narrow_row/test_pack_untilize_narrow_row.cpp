@@ -293,7 +293,7 @@ bool run_narrow_row(
         .dataflow_buffers = {src_dfb_spec, pad_dfb_spec},
         .work_units = {{.name = "main", .kernels = {READER, COMPUTE, COMPACT}, .target_nodes = node}},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -317,7 +317,7 @@ bool run_narrow_row(
                  {"num_channels", cfg.num_channels}}),
         },
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     distributed::MeshWorkload workload;
     distributed::MeshCoordinateRange device_range(mesh_device->shape());

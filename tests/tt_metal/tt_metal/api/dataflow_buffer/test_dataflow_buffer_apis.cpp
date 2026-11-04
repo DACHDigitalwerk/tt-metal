@@ -160,7 +160,7 @@ TEST_F(UnitMeshFixture, DataflowBufferReadTileValue) {
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(this->device(), spec);
+    Program program = experimental::MakeProgramFromSpec(this->device(), spec);
 
     const uint32_t result_size_bytes = static_cast<uint32_t>(expected_scalar_reads.size() * sizeof(DataT));
     const uint32_t result_l1_addr = top_of_l1_scratch_addr(this->device(), result_size_bytes);
@@ -178,7 +178,7 @@ TEST_F(UnitMeshFixture, DataflowBufferReadTileValue) {
         },
     };
     params.tensor_args = {{IN_TENSOR, std::cref(in_tensor)}};
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     const uint32_t total_words = num_entries * words_per_entry;
     auto input = tt::test_utils::generate_uniform_random_vector<DataT>(0, 1000000, total_words);
@@ -454,7 +454,7 @@ void run_extent_probe(distributed::MeshDevice& mesh_device, const ExtentProbePar
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     const uint32_t producer_records = params.num_producers * params.producer.num_tc_snapshots;
     const uint32_t consumer_records = params.consumer.num_tc_snapshots;
@@ -473,7 +473,7 @@ void run_extent_probe(distributed::MeshDevice& mesh_device, const ExtentProbePar
             .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"result_l1_addr", consumer_result_l1}}),
         },
     };
-    SetProgramRunArgs(program, run_args);
+    experimental::SetProgramRunArgs(program, run_args);
 
     LaunchProgram(mesh_device, std::move(program));
     tt_driver_atomics::mfence();

@@ -221,8 +221,8 @@ void run_push_and_pop(
               .kernels = {KernelSpecName{"receiver"}},
               .target_nodes = experimental::GetPrefetcherPipeReceiverCores(set.pipe_refs())}},
         .advanced_options = {.prefetcher_pipe_parameters = std::move(pipe_parameters)}};
-    Program receiver_program = MakeProgramFromSpec(mesh_device, spec);
-    SetProgramRunArgs(receiver_program, run_args);
+    Program receiver_program = experimental::MakeProgramFromSpec(mesh_device, spec);
+    experimental::SetProgramRunArgs(receiver_program, run_args);
 
     const uint32_t pattern_base = static_cast<uint32_t>(drisc_pattern_base(mesh_device));
     Program sender_program = CreateProgram(mesh_device);
@@ -650,10 +650,10 @@ TEST_F(PrefetcherPipeDramSenderFixture, BindingAcceptsAnyEntrySizeTheRingHolds) 
                      .receivers = receiver_cores,
                      .ring_size = ring_size,
                      .entry_size = entry_size}}}};
-        Program program = MakeProgramFromSpec(*mesh_device_, spec);
+        Program program = experimental::MakeProgramFromSpec(*mesh_device_, spec);
         ProgramRunArgs args;
         args.advanced_options.prefetcher_pipe_args.emplace(name, PrefetcherPipeArgument{set.pipes[0]});
-        SetProgramRunArgs(program, args);
+        experimental::SetProgramRunArgs(program, args);
     };
     // L1-aligned and well inside the ring, so only a divisibility rule could have rejected it.
     constexpr uint32_t kRingIndivisibleEntrySize = 48;

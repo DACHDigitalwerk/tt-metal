@@ -604,7 +604,7 @@ bool single_core_binary(
 
     auto device_range = distributed::MeshCoordinateRange(mesh_device->shape());
     distributed::MeshWorkload workload;
-    workload.add_program(device_range, MakeProgramFromSpec(*mesh_device, spec));
+    workload.add_program(device_range, experimental::MakeProgramFromSpec(*mesh_device, spec));
     Program& program = workload.get_programs().at(device_range);
 
     ProgramRunArgs params;
@@ -635,7 +635,7 @@ bool single_core_binary(
                  {"acc_to_dst", 0u}}),
         },
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     std::vector<std::uint32_t> first_result;
     for (std::uint32_t run = 0; run < num_runs; ++run) {

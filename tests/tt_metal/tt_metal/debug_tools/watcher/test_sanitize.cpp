@@ -336,7 +336,7 @@ void RunTestOnCore(
             .kernels = {dm_spec},
             .work_units = {wu},
         };
-        program = MakeProgramFromSpec(*mesh_device, spec);
+        program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
         if (is_quasar) {
             // Quasar SD does not yet expose a NOC index in the same way as legacy DMs; the watcher
             // log emits "noc0" for Metal 2.0 DM kernels. Match that so expected strings line up.
@@ -570,7 +570,7 @@ void RunTestOnCore(
                  {"invalid_txn_id", invalid_txn_id},
                  {"use_dram_bank_dst", use_dram_bank_dst}}),
         }};
-        SetProgramRunArgs(program, params);
+        tt_metal::experimental::SetProgramRunArgs(program, params);
     }
     workload.add_program(device_range, std::move(program));
 

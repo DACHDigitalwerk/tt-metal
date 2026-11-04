@@ -294,7 +294,7 @@ bool reader_writer(const std::shared_ptr<distributed::MeshDevice>& mesh_device, 
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -317,7 +317,7 @@ bool reader_writer(const std::shared_ptr<distributed::MeshDevice>& mesh_device, 
                  {"dram_page_stride", per_tile_stride}}),
         },
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(*mesh_device, std::move(program));
 
@@ -519,7 +519,7 @@ bool reader_datacopy_writer(
         .work_units = {wu},
     };
 
-    distributed::MeshWorkload workload = MakeMeshWorkloadFromSpec(*mesh_device, spec);
+    distributed::MeshWorkload workload = tt_metal::experimental::MakeMeshWorkloadFromSpec(*mesh_device, spec);
     Program& program = workload.get_programs().begin()->second;
 
     log_info(tt::LogTest, "Num tiles per thread: {}", num_tiles_per_thread);
@@ -546,7 +546,7 @@ bool reader_datacopy_writer(
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     distributed::EnqueueMeshWorkload(mesh_device->mesh_command_queue(), workload, /*blocking=*/true);
 

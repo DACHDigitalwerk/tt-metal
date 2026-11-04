@@ -144,7 +144,7 @@ void RunTest(
                 .target_nodes = NodeCoord{logical_core},
             };
             ProgramSpec spec{.name = "watcher_ringbuf", .kernels = {kernel_spec}, .work_units = {wu}};
-            program = MakeProgramFromSpec(*mesh_device, spec);
+            program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
             break;
         }
         case HalProgrammableCoreType::ACTIVE_ETH:
@@ -312,7 +312,7 @@ void RunMultiWriterTest(
 
     WorkUnitSpec wu{.name = "main", .kernels = names, .target_nodes = NodeCoord{logical_core}};
     ProgramSpec spec{.name = "watcher_ringbuf_multi", .kernels = specs, .work_units = {wu}};
-    workload.add_program(device_range, MakeProgramFromSpec(*mesh_device, spec));
+    workload.add_program(device_range, tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec));
 
     const int dumps_before_run = MetalContext::instance().watcher_server()->dump_count();
     fixture->RunProgram(mesh_device, workload, true);

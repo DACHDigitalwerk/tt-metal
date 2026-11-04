@@ -630,7 +630,7 @@ static Program build_quasar_program(
         .work_units = {WorkUnitSpec{.name = "main", .kernels = {READER, WRITER, COMPUTE}, .target_nodes = node}},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     const uint32_t per_tile_stride =
         num_tiles == 0 ? 0 : static_cast<uint32_t>(input_dram_buffer->device_local_size() / num_tiles);
@@ -653,7 +653,7 @@ static Program build_quasar_program(
                  {"num_tiles", num_tiles},
                  {"dram_page_stride", per_tile_stride}})},
     };
-    SetProgramRunArgs(program, run_args);
+    tt_metal::experimental::SetProgramRunArgs(program, run_args);
     return program;
 }
 

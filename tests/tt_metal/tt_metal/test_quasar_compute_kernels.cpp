@@ -75,14 +75,14 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarComputeKernelMultipleThreads) {
         .kernels = {compute_kernel_spec},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = COMPUTE_KERNEL,
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"l1_address", l1_address}}),
     }};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     distributed::EnqueueMeshWorkload(cq, workload, true);
@@ -151,14 +151,14 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarComputeKernelSingleThread) {
         .kernels = {compute_kernel_spec},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = COMPUTE_KERNEL,
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"l1_address", l1_address}}),
     }};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     distributed::EnqueueMeshWorkload(cq, workload, true);
@@ -212,5 +212,5 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarCreateMultipleComputeKernelsSing
         .work_units = {main_wu},
     };
 
-    ASSERT_THROW(MakeProgramFromSpec(this->device(), spec), std::runtime_error);
+    ASSERT_THROW(tt_metal::experimental::MakeProgramFromSpec(this->device(), spec), std::runtime_error);
 }

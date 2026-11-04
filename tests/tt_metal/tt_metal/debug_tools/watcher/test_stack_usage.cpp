@@ -150,7 +150,7 @@ void RunOneTest(
         .kernels = kernel_specs,
         .work_units = {wu},
     };
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     // Idle-ETH cores: invoke the original (legacy) kernel via the legacy host API.
     if (!is_quasar) {

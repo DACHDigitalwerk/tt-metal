@@ -95,7 +95,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, GlobalsAndTLS) {
         .kernels = {k1, k2, k3},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(this->device(), spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(this->device(), spec);
 
     auto make_kernel_run_params = [&]() {
         return ProgramRunArgs::KernelRunArgs{
@@ -116,7 +116,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, GlobalsAndTLS) {
     auto kra3 = make_kernel_run_params();
     kra3.kernel = DM_KERNEL_3;
     params.kernel_run_args = {kra1, kra2, kra3};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(this->device(), std::move(program));
 
@@ -321,7 +321,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarComputeKernelTLS) {
         .kernels = {compute_kernel_spec},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(this->device(), spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(this->device(), spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
@@ -329,7 +329,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, QuasarComputeKernelTLS) {
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(
             node, {{"l1_result_addr", l1_result_addr}, {"signal_address", signal_address}}),
     }};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(this->device(), std::move(program));
 

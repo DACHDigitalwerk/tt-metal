@@ -247,8 +247,8 @@ ttnn::device_operation::ProgramArtifacts SliceTileProgramFactory::create_program
 SliceTileProgramFactory::cached_program_t SliceTileProgramFactory::create(
     const SliceParams& args, const SliceInputs& tensor_args, Tensor& output) {
     auto artifacts = create_program_artifacts(args, tensor_args, output);
-    auto program = MakeProgramFromSpec(*tensor_args.input.device(), artifacts.spec);
-    SetProgramRunArgs(program, artifacts.run_params);
+    auto program = tt::tt_metal::experimental::MakeProgramFromSpec(*tensor_args.input.device(), artifacts.spec);
+    tt::tt_metal::experimental::SetProgramRunArgs(program, artifacts.run_params);
     // The cache key includes the full input/output geometry, slice bounds and core grid. Reuse the
     // resulting work assignments, but re-apply them on hits to preserve scalar restoration (#52651).
     // Do not retain non-owning references to the miss's tensors after this call.
@@ -261,7 +261,8 @@ void SliceTileProgramFactory::override_runtime_arguments(
     using namespace ttnn::prim::slice_metal2;
     auto& run_args = cached_program.shared_variables.run_args;
     run_args.tensor_args = {{INPUT, tensor_args.input.mesh_tensor()}, {OUTPUT, output.mesh_tensor()}};
-    UpdateProgramRunArgs(cached_program.program, run_args, !ttnn::CONFIG.get<"validate_program_args">());
+    tt::tt_metal::experimental::UpdateProgramRunArgs(
+        cached_program.program, run_args, !ttnn::CONFIG.get<"validate_program_args">());
     run_args.tensor_args.clear();
 }
 

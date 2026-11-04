@@ -126,8 +126,8 @@ protected:
             .kernels = kernel_specs,
             .work_units = {main_wu},
         };
-        program = MakeProgramFromSpec(this->device(), spec);
-        SetProgramRunArgs(program, params);
+        program = experimental::MakeProgramFromSpec(this->device(), spec);
+        experimental::SetProgramRunArgs(program, params);
 
         workload.add_program(device_range, std::move(program));
         RunProgram(devices_.front(), workload);

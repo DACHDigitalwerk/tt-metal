@@ -547,7 +547,7 @@ void run_mixed_ack_device(tt::tt_metal::distributed::MeshDevice& device, NOC noc
         .work_units = {{.name = "mixed", .kernels = {targets.front()}, .target_nodes = receivers}}};
     m2::ProgramRunArgs args;
     channel.attach(spec, args, "channel", targets);
-    auto workload = m2::MakeMeshWorkloadFromSpec(device, spec);
+    auto workload = m2::experimental::MakeMeshWorkloadFromSpec(device, spec);
     auto* physical = device.impl().get_devices().front();
     for (uint32_t run = 0; run < 3; ++run) {
         auto invocation = args;
@@ -562,7 +562,7 @@ void run_mixed_ack_device(tt::tt_metal::distributed::MeshDevice& device, NOC noc
             tt::tt_metal::detail::WriteToDeviceL1(physical, core, report_addr, zero);
         }
         for (auto& [region, program] : workload.get_programs()) {
-            m2::SetProgramRunArgs(program, invocation);
+            m2::experimental::SetProgramRunArgs(program, invocation);
         }
         EnqueueMeshWorkload(device.mesh_command_queue(), workload, true);
         for (const auto& core : corerange_to_cores(receivers)) {

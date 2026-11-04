@@ -75,7 +75,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, DmStatefulLoopback) {
             .target_nodes = node,
         }},
     };
-    Program program = MakeProgramFromSpec(this->device(), spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(this->device(), spec);
 
     ProgramRunArgs params;
     params.kernel_run_args.push_back(ProgramRunArgs::KernelRunArgs{
@@ -86,7 +86,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, DmStatefulLoopback) {
              {"dram_out_addr", dram_out_address},
              {"l1_addr", l1_address},
              {"dram_bank_id", 0u}})});
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     workload.add_program(device_range, std::move(program));
     distributed::EnqueueMeshWorkload(cq, workload, true);

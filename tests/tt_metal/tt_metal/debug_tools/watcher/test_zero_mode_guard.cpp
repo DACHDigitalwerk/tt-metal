@@ -100,7 +100,7 @@ Program make_program(const std::shared_ptr<distributed::MeshDevice>& mesh_device
         .dataflow_buffers = {scratch_spec},
         .work_units = {{.name = "main", .kernels = {PRODUCER, CONSUMER}, .target_nodes = node}},
     };
-    return MakeProgramFromSpec(*mesh_device, spec);
+    return tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec);
 }
 
 void set_args(Program& program, uint32_t should_trip) {
@@ -113,7 +113,7 @@ void set_args(Program& program, uint32_t should_trip) {
                 MakeRuntimeArgsForSingleNode(node, {{"should_trip", should_trip}, {"zero_bytes", kZeroBytes}}),
         },
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 }
 
 void RunZeroModeTest(MeshWatcherFixture* fixture, const std::shared_ptr<distributed::MeshDevice>& mesh_device) {

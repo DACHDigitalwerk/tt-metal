@@ -431,7 +431,7 @@ void run_single_core_sfpu_reduce(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     const auto seed = static_cast<std::uint32_t>(std::chrono::system_clock::now().time_since_epoch().count());
     const std::vector<double> input = generate_stimulus(config, rows, cols, seed);
@@ -469,7 +469,7 @@ void run_single_core_sfpu_reduce(
                  {"num_tiles", num_tiles},
                  {"dram_page_stride", dst_page_stride}})},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(*mesh_device, std::move(program));
 

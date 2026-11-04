@@ -135,7 +135,7 @@ void run_pack_relu_test(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(mesh_device, spec);
 
     // Stimulus: random bfloat16 in [-1, 1]
     std::vector<uint32_t> src_vec = create_random_vector_of_bfloat16(dram_buffer_size, 1.0f, 0xCAFE);
@@ -172,7 +172,7 @@ void run_pack_relu_test(
             .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"relu_config", relu_config}}),
         },
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(mesh_device, std::move(program));
 

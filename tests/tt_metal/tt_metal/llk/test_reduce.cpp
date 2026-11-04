@@ -501,7 +501,7 @@ void run_single_core_reduce_program(distributed::MeshDevice& mesh_device, const 
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     // Reader/writer RTAs depend on reduce_dim
     KernelRunArgs::RuntimeArgValues reader_named_rtas;
@@ -543,7 +543,7 @@ void run_single_core_reduce_program(distributed::MeshDevice& mesh_device, const 
         {IN_TENSOR, ProgramRunArgs::TensorArgument{in_tensor}},
         {OUT_TENSOR, ProgramRunArgs::TensorArgument{out_tensor}},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     // Shared seeded stimulus (packed bf16, TILED_NFACES). For bf16 input this is written to the
     // device as-is; for MxFp4 input it is quantized to MxFp4 for the device.
@@ -737,7 +737,7 @@ void run_single_core_reduce_h_mxfp4_2x_then_add(distributed::MeshDevice& mesh_de
             },
         .work_units = {wu},
     };
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -753,7 +753,7 @@ void run_single_core_reduce_h_mxfp4_2x_then_add(distributed::MeshDevice& mesh_de
         {SCALER_TENSOR, ProgramRunArgs::TensorArgument{scaler_tensor}},
         {OUT_TENSOR, ProgramRunArgs::TensorArgument{out_tensor}},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     // Data: the same seeded stimulus as the other MxFp4 reduce tests, quantized to MxFp4 (tile-major).
     // Scaler: the SUM scaler (1.0) in the first row of each face, 0 elsewhere (tile-major).

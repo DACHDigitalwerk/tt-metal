@@ -396,7 +396,7 @@ static void matmul_tile_block(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     distributed::MeshWorkload workload;
     auto zero_coord = distributed::MeshCoordinate(0, 0);
@@ -437,7 +437,7 @@ static void matmul_tile_block(
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program_run, params);
+    experimental::SetProgramRunArgs(program_run, params);
 
     fixture->RunProgram(mesh_device, workload);
 

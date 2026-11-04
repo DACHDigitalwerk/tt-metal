@@ -41,13 +41,14 @@ Program BuildProgramFromSpec(distributed::MeshDevice& mesh_device, const Program
 // Public Entry Points
 // ============================================================================
 
-Program MakeProgramFromSpec(distributed::MeshDevice& mesh_device, const ProgramSpec& spec, bool skip_validation) {
+Program experimental::MakeProgramFromSpec(
+    distributed::MeshDevice& mesh_device, const ProgramSpec& spec, bool skip_validation) {
     Program program = BuildProgramFromSpec(mesh_device, spec, skip_validation);
     program.impl().compile_and_allocate(&mesh_device, false);
     return program;
 }
 
-distributed::MeshWorkload MakeMeshWorkloadFromSpecs(
+distributed::MeshWorkload experimental::MakeMeshWorkloadFromSpecs(
     distributed::MeshDevice& mesh_device,
     const std::unordered_map<distributed::MeshCoordinateRange, ProgramSpec>& program_specs,
     bool skip_validation) {
@@ -66,7 +67,7 @@ distributed::MeshWorkload MakeMeshWorkloadFromSpecs(
     return workload;
 }
 
-distributed::MeshWorkload MakeMeshWorkloadFromSpec(
+distributed::MeshWorkload experimental::MakeMeshWorkloadFromSpec(
     distributed::MeshDevice& mesh_device, const ProgramSpec& program_spec, bool skip_validation) {
     distributed::MeshWorkload workload;
     workload.impl().add_program(

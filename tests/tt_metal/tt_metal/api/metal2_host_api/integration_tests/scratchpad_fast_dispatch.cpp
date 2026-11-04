@@ -103,7 +103,7 @@ TEST_F(UnitMeshCQSingleCardFixture, ScratchpadWriteReadback) {
         }},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     // -------------------------------------------------------
     // Runtime args: the host-known report L1 address.
@@ -113,7 +113,7 @@ TEST_F(UnitMeshCQSingleCardFixture, ScratchpadWriteReadback) {
         .kernel = KernelSpecName{"scratch_kernel"},
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"report_addr", kReportAddr}}),
     }};
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     // Pre-zero the report location so a kernel that never wrote it would be caught (the readback
     // base address would be 0, which is not a valid scratchpad L1 address → the pattern check fails).
@@ -232,7 +232,7 @@ TEST_F(UnitMeshCQSingleCardFixture, ScratchpadNocEndpoints) {
         }},
     };
 
-    Program program = MakeProgramFromSpec(*mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(*mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
@@ -245,7 +245,7 @@ TEST_F(UnitMeshCQSingleCardFixture, ScratchpadNocEndpoints) {
              {"dst_addr", kDstAddr},
              {"report_addr", kReportAddr}}),
     }};
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     // -------------------------------------------------------
     // Seed the remote core: pattern at kSrcAddr, zeros at kDstAddr.

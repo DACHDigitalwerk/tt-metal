@@ -541,14 +541,14 @@ Program create_quasar_l1_write_program(
         }},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = dm_kernel_name,
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"address", l1_address}}),
         .common_runtime_arg_values = {{"value", value}},
     }};
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
     return program;
 }
 

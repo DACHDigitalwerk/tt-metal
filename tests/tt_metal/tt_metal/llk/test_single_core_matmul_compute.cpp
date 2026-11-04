@@ -864,7 +864,7 @@ bool blocked_matmul(const std::shared_ptr<distributed::MeshDevice>& mesh_device,
         .work_units = {wu},
     };
 
-    workload.add_program(device_range, MakeProgramFromSpec(*mesh_device, spec));
+    workload.add_program(device_range, experimental::MakeProgramFromSpec(*mesh_device, spec));
     auto& program_ = workload.get_programs().at(device_range);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -935,7 +935,7 @@ bool blocked_matmul(const std::shared_ptr<distributed::MeshDevice>& mesh_device,
                 node, {{"dst_addr", out_dram_addr}, {"bank_id", 0u}, {"num_tiles", M * N}}),
         },
     };
-    SetProgramRunArgs(program_, run_args);
+    experimental::SetProgramRunArgs(program_, run_args);
 
     auto blocking = is_quasar;
     distributed::EnqueueMeshWorkload(cq, workload, blocking);
@@ -1157,7 +1157,7 @@ void run_matmul_no_mop(const std::shared_ptr<distributed::MeshDevice>& mesh_devi
         .work_units = {wu},
     };
 
-    Program built_program = MakeProgramFromSpec(*mesh_device, spec);
+    Program built_program = experimental::MakeProgramFromSpec(*mesh_device, spec);
     workload.add_program(device_range, std::move(built_program));
     auto& program_run = workload.get_programs().at(device_range);
 
@@ -1184,7 +1184,7 @@ void run_matmul_no_mop(const std::shared_ptr<distributed::MeshDevice>& mesh_devi
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program_run, params);
+    experimental::SetProgramRunArgs(program_run, params);
 
     // make_operand_stimulus emits face-major tile order, which is the DRAM page order the reader
     // streams and the order make_matmul_golden indexes, so no tilize/untilize round trip is needed.

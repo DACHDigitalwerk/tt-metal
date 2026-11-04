@@ -319,7 +319,7 @@ void run_single_core_transpose(distributed::MeshDevice& mesh_device, const Trans
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     ProgramRunArgs params;
     params.kernel_run_args = {
@@ -338,7 +338,7 @@ void run_single_core_transpose(distributed::MeshDevice& mesh_device, const Trans
         {IN_TENSOR, ProgramRunArgs::TensorArgument{in_tensor}},
         {OUT_TENSOR, ProgramRunArgs::TensorArgument{out_tensor}},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     // Fixed seed so each test produces a repeatable input vector across runs.
     constexpr std::uint32_t kRandomSeed = 0x1234;

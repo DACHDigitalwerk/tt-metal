@@ -410,7 +410,7 @@ void run_single_core_tilize_program(distributed::MeshDevice& mesh_device, const 
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     std::vector<std::uint32_t> src0_vec = test_config.src0_data.empty()
                                               ? create_arange_vector_of_bfloat16(input_dram_buffer_size, false)
@@ -442,7 +442,7 @@ void run_single_core_tilize_program(distributed::MeshDevice& mesh_device, const 
             node, {{"dst_addr", dram_buffer_dst_addr}, {"bank_id", 0u}, {"num_tiles", num_tiles}}),
     });
     params.kernel_run_args.push_back(ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE});
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(mesh_device, std::move(program));
 
@@ -736,7 +736,7 @@ void run_single_core_unpack_tilizeA_B_reduce_program(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     std::vector<std::uint32_t> src0_vec = create_random_vector_of_bfloat16(input_dram_buffer_size, 100, 42);
     slow_dispatch::WriteToBuffer(in_tensor.mesh_buffer(), src0_vec);
@@ -761,7 +761,7 @@ void run_single_core_unpack_tilizeA_B_reduce_program(
         {IN_TENSOR, ProgramRunArgs::TensorArgument{in_tensor}},
         {OUT_TENSOR, ProgramRunArgs::TensorArgument{out_tensor}},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(mesh_device, std::move(program));
 
@@ -1212,7 +1212,7 @@ static void run_quasar_tilize_untilize_test(
         .work_units = {wu},
     };
 
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = experimental::MakeProgramFromSpec(mesh_device, spec);
 
     std::vector<std::uint32_t> src_vec;
     if (input_data_format == tt::DataFormat::Int8) {
@@ -1269,7 +1269,7 @@ static void run_quasar_tilize_untilize_test(
         },
         ProgramRunArgs::KernelRunArgs{.kernel = COMPUTE},
     };
-    SetProgramRunArgs(program, params);
+    experimental::SetProgramRunArgs(program, params);
 
     LaunchProgram(mesh_device, std::move(program));
 

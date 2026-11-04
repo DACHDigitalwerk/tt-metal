@@ -167,7 +167,7 @@ void RunSharedNocCmdBufTest(
     };
 
     distributed::MeshWorkload workload;
-    workload.add_program(device_range, MakeProgramFromSpec(*mesh_device, spec));
+    workload.add_program(device_range, tt_metal::experimental::MakeProgramFromSpec(*mesh_device, spec));
 
     if (!ncrisc_writes) {
         fixture->RunProgram(mesh_device, workload, /*wait_for_dump=*/true);

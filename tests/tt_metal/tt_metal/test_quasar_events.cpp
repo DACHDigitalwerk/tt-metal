@@ -46,14 +46,14 @@ distributed::MeshWorkload make_l1_write_workload(
     WorkUnitSpec main_wu{.name = "main", .kernels = {DM_KERNEL}, .target_nodes = node};
     ProgramSpec spec{
         .name = std::string("l1_write_") + kernel_id, .kernels = {dm_kernel_spec}, .work_units = {main_wu}};
-    Program program = MakeProgramFromSpec(mesh_device, spec);
+    Program program = tt_metal::experimental::MakeProgramFromSpec(mesh_device, spec);
     ProgramRunArgs params;
     params.kernel_run_args = {ProgramRunArgs::KernelRunArgs{
         .kernel = DM_KERNEL,
         .runtime_arg_values = MakeRuntimeArgsForSingleNode(node, {{"address", address}}),
         .common_runtime_arg_values = {{"value", value}},
     }};
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
     wl.add_program(device_range, std::move(program));
     return wl;
 }

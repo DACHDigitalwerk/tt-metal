@@ -130,7 +130,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, HostHugepagePcieLoopback) {
         .kernels = {dm_kernel_spec},
         .work_units = {main_wu},
     };
-    Program program = MakeProgramFromSpec(this->device(), spec);
+    Program program = experimental::MakeProgramFromSpec(this->device(), spec);
 
     LaunchProgram(this->device(), std::move(program));
 

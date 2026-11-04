@@ -258,7 +258,7 @@ void set_bmm_run_args(Program& program, const BmmParams& p, const BmmTensors& te
         {SRC1_T, TensorArgument{tensors.src1}},
         {DST_T, TensorArgument{tensors.dst}},
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 }
 
 struct BmmInputs {
@@ -318,7 +318,7 @@ BmmSingleNode setup_bmm_single_node(distributed::MeshDevice& mesh_device, const 
     const bool use_implicit_sync = (mesh_device.arch() == ARCH::QUASAR);
     auto spec = build_bmm_program_spec(p, tensors, node, use_implicit_sync);
     BmmSingleNode bmm{
-        .workload = MakeMeshWorkloadFromSpec(mesh_device, spec),
+        .workload = tt_metal::experimental::MakeMeshWorkloadFromSpec(mesh_device, spec),
         .inputs = make_bmm_inputs(p),
     };
     set_bmm_run_args(bmm.workload.get_programs().begin()->second, p, tensors, node);
@@ -374,7 +374,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, BmmMultinode) {
 
     // QuasarMeshDeviceSingleCardFixture only opens Quasar devices, so implicit sync is always on.
     auto spec = build_bmm_program_spec(p, tensors, node_range, /*use_implicit_sync=*/true);
-    auto program = MakeProgramFromSpec(mesh_device, spec);
+    auto program = tt_metal::experimental::MakeProgramFromSpec(mesh_device, spec);
 
     constexpr std::uint32_t do_bcast = 0;
     // node0 handles batch 0, node1 handles batch 1 (batch_start = node index)
@@ -404,7 +404,7 @@ TEST_F(QuasarMeshDeviceSingleCardFixture, BmmMultinode) {
         {SRC1_T, TensorArgument{tensors.src1}},
         {DST_T, TensorArgument{tensors.dst}},
     };
-    SetProgramRunArgs(program, params);
+    tt_metal::experimental::SetProgramRunArgs(program, params);
 
     const BmmInputs inputs = make_bmm_inputs(p);
     // MeshTensor doesn't yet expose slow-dispatch read/write APIs; use unit-mesh MeshBuffer helpers.

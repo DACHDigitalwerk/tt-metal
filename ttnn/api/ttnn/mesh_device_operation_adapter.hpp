@@ -775,7 +775,7 @@ public:
     // ONLY create_program_artifacts, returning a single ProgramArtifacts (one
     // ProgramSpec + ProgramRunArgs + any op-owned tensors). The adapter maps
     // that same ProgramSpec onto every range in tensor_coords via
-    // tt::tt_metal::MakeMeshWorkloadFromSpecs (occupancy = mesh devices that
+    // tt::tt_metal::experimental::MakeMeshWorkloadFromSpecs (occupancy = mesh devices that
     // hold a tensor shard). A factory whose programs vary across the mesh is a
     // MeshWorkloadSpecFactoryConcept instead.
     //
@@ -789,7 +789,7 @@ public:
     //
     // On cache hit: the adapter enumerates fresh io tensors, appends the parked
     // op-owned tensors, rebuilds a TensorArgument for every binding using the
-    // stored indices, and applies via tt::tt_metal::UpdateTensorArgs — no Program
+    // stored indices, and applies via tt::tt_metal::experimental::UpdateTensorArgs — no Program
     // rebuild. Op-owned tensors are re-patched even though their address is
     // unchanged, because UpdateTensorArgs is currently all-or-nothing; this
     // stepping-stone concept accepts that redundancy.
@@ -861,7 +861,7 @@ public:
                 for (const auto& b : sv.bindings) {
                     fresh_tensor_args.emplace(b.tensor_parameter_name, TensorArgument{mesh_tensors[b.tensor_idx]});
                 }
-                tt::tt_metal::UpdateTensorArgs(program, fresh_tensor_args, skip_validation);
+                tt::tt_metal::experimental::UpdateTensorArgs(program, fresh_tensor_args, skip_validation);
             }
         }
 
@@ -891,7 +891,7 @@ public:
                         run_args.advanced_options.prefetcher_pipe_args.emplace(
                             b.pipe_parameter_name, PrefetcherPipeArgument{*prefetcher_pipes[b.pipe_idx]});
                     }
-                    tt::tt_metal::UpdateProgramRunArgs(program, run_args, skip_validation);
+                    tt::tt_metal::experimental::UpdateProgramRunArgs(program, run_args, skip_validation);
                 }
             }
         }
@@ -1078,9 +1078,9 @@ public:
 
             // Cache miss is the cold path: always validate here, so every cached program was
             // built from a checked spec. validate_program_args only gates the hit-path re-checks.
-            auto mesh_workload = tt::tt_metal::MakeMeshWorkloadFromSpecs(*mesh_device, program_specs);
+            auto mesh_workload = tt::tt_metal::experimental::MakeMeshWorkloadFromSpecs(*mesh_device, program_specs);
             for (auto& [range, program] : mesh_workload.get_programs()) {
-                tt::tt_metal::SetProgramRunArgs(program, run_params.at(range));
+                tt::tt_metal::experimental::SetProgramRunArgs(program, run_params.at(range));
             }
             return cached_mesh_workload_t{std::move(mesh_workload), std::move(shared_variables)};
         }
@@ -1124,7 +1124,7 @@ public:
                     tensor_args,
                     tensor_return_value,
                     std::optional<ttnn::MeshCoordinate>(coordinate_range.start_coord()));
-                tt::tt_metal::UpdateProgramRunArgs(program, run_args, skip_validation);
+                tt::tt_metal::experimental::UpdateProgramRunArgs(program, run_args, skip_validation);
             }
         }
     };
@@ -1213,9 +1213,9 @@ public:
                 run_params.emplace(per_coord.range, std::move(per_coord.run_params));
             }
 
-            auto mesh_workload = tt::tt_metal::MakeMeshWorkloadFromSpecs(*mesh_device, program_specs);
+            auto mesh_workload = tt::tt_metal::experimental::MakeMeshWorkloadFromSpecs(*mesh_device, program_specs);
             for (auto& [range, program] : mesh_workload.get_programs()) {
-                tt::tt_metal::SetProgramRunArgs(program, run_params.at(range));
+                tt::tt_metal::experimental::SetProgramRunArgs(program, run_params.at(range));
             }
             return cached_mesh_workload_t{std::move(mesh_workload), std::move(shared_variables)};
         }
@@ -1231,7 +1231,7 @@ public:
                 for (auto& [coordinate_range, program] : cached_workload.workload.get_programs()) {
                     auto run_args = WorkloadSpecFactory::override_runtime_arguments(
                         attrs, tensor_args, tensor_return_value, coordinate_range);
-                    tt::tt_metal::UpdateProgramRunArgs(program, run_args, skip_validation);
+                    tt::tt_metal::experimental::UpdateProgramRunArgs(program, run_args, skip_validation);
                 }
             } else {
                 SpecBindingSupport::refresh_tensor_args(cached_workload, tensor_args, tensor_return_value);

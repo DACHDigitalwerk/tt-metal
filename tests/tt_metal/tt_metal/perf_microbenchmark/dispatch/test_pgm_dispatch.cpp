@@ -460,8 +460,8 @@ bool initialize_program(
         total_kg.start_coord.x = total_kg.end_coord.x;
     }
 
-    program = m2::MakeProgramFromSpec(*mesh_device, spec);
-    m2::SetProgramRunArgs(program, run_args);
+    program = m2::experimental::MakeProgramFromSpec(*mesh_device, spec);
+    m2::experimental::SetProgramRunArgs(program, run_args);
     return true;
 }
 
