@@ -245,7 +245,7 @@ const m2::KernelSpecName KERNEL_OUT_DRAIN{"out_drain"};  // Program A: credit-on
 // [#48552] Per-kernel runtime-arg population helpers, extracted from create_program_artifacts to keep its
 // clang-tidy cognitive complexity under threshold. Pure code motion: each fills the per-kernel run-args map
 // that the orchestration function then moves into ProgramRunArgs; no logic changes. Namespace scope here
-// (ttnn::prim::qsr, with `using namespace tt::tt_metal` and `namespace m2 = ...experimental` active) so all
+// (ttnn::prim::qsr, with `using namespace tt::tt_metal` and `namespace m2 = tt::tt_metal` active) so all
 // types resolve.
 // Multicast destination rectangle. Mirrors the fix already applied to the Quasar
 // matmul factories (matmul_multicore_reuse_mcast_2d_program_factory.cpp):

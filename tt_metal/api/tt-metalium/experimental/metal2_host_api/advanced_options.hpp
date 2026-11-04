@@ -17,8 +17,8 @@
 
 // The PrefetcherPipe host handle (tt-metalium/experimental/prefetcher_pipe.hpp). Only referenced
 // here, so the pipe implementation is not a dependency of the core Metal 2.0 spec headers.
-// NOTE: PrefetcherPipe stays experimental when the Metal 2.0 host API graduates. This declaration
-//       and its fully qualified use in AdvancedProgramRunArgs must keep the experimental namespace.
+// NOTE: PrefetcherPipe remains experimental independently of the stable Metal 2.0 specification API.
+//       This declaration and its use in AdvancedProgramRunArgs must keep the experimental namespace.
 namespace tt::tt_metal::experimental {
 class PrefetcherPipe;
 }  // namespace tt::tt_metal::experimental
