@@ -311,7 +311,7 @@ tt::tt_metal::Program build_program(
 
     // Kernels.
     const auto* logits_buffer = &logits.mesh_buffer();
-    auto* mask_buffer = has_mask ? tensor_args.logits_mask->buffer() : nullptr;
+    const auto* mask_buffer = has_mask ? &tensor_args.logits_mask->mesh_buffer() : nullptr;
     const auto* output_buffer = &output.mesh_buffer();
 
     // Greedy vs noisy is decided by uses_gumbel_noise, NOT `temperature > 0`: a positive
