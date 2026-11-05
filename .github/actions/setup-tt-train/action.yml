@@ -31,6 +31,7 @@ runs:
           echo "LD_LIBRARY_PATH=$TT_METAL_RUNTIME_ROOT/build/lib"
           echo "TEST_DATA_DIR=$TT_METAL_RUNTIME_ROOT/data"
           echo "ENABLE_CI_ONLY_TT_TRAIN_TESTS=1"
+          echo "HF_HUB_OFFLINE=0"
         } >> "$GITHUB_ENV"
         if [[ -n "$HF_TOKEN_INPUT" ]]; then
           echo "HF_TOKEN=$HF_TOKEN_INPUT" >> "$GITHUB_ENV"
