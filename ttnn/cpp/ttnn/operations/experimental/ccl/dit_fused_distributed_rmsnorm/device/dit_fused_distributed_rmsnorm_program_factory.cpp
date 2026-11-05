@@ -335,7 +335,7 @@ DitFusedDistributedRmsnormSizing compute_sizing(
         // round is one tile-row of the worker group.
         const uint32_t num_links_requested = std::max<uint32_t>(1u, args.num_links);
         s.num_forwarders = std::min<uint32_t>(num_links_requested, s.num_workers);
-        s.max_rounds = ttnn::runtime_length::rounds(s.capacity_tile_rows, s.num_workers);
+        s.max_rounds = ttnn::runtime_length::div_up(s.capacity_tile_rows, s.num_workers);
         // Pack as many 128 B fp32 sticks as fit one fabric packet. Reuse the
         // existing page formula by setting window_size = sticks_per_packet:
         // page_size_bytes = TILE_HEIGHT(=32) * window_size * 4 = sticks * 128.
@@ -357,7 +357,7 @@ uint32_t stats_pages_for_rows(
     if (!sizing.use_mux) {
         return 0u;
     }
-    return ring_size * sizing.num_forwarders * ttnn::runtime_length::rounds(num_tile_rows, sizing.num_workers);
+    return ring_size * sizing.num_forwarders * ttnn::runtime_length::div_up(num_tile_rows, sizing.num_workers);
 }
 
 uint32_t tile_row_map_cb_bytes(const Tensor& tile_row_map, uint32_t capacity_tile_rows) {
