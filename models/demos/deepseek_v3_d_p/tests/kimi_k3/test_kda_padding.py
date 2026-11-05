@@ -12,6 +12,7 @@ import torch
 import ttnn
 from models.common.utility_functions import run_for_blackhole
 from models.demos.deepseek_v3_d_p.reference.kda import KDAConfig, KDAReferenceState, kda_forward_reference
+from models.demos.deepseek_v3_d_p.tests.kda.kda_test_utils import assert_bit_identical, make_actual_start
 from models.demos.deepseek_v3_d_p.tests.kda.utils import (
     LayerNrmseThresholds,
     assert_matches_reference,
@@ -33,7 +34,6 @@ from models.demos.deepseek_v3_d_p.tt.kda.state_adapter import (
     device_scalar,
 )
 from models.demos.deepseek_v3_d_p.tt.kimi_k3.attention import TtK3KdaAttention
-from tt_py_test_utils_common.kda_test_utils import assert_bit_identical, make_actual_start
 
 pytestmark = run_for_blackhole()
 
