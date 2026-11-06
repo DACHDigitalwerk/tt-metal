@@ -66,9 +66,8 @@ constexpr uint32_t kRopeStreamBlocks = 2u;
 //   2. fabric-packet validity: workers_per_forwarder must fit one coalesced packet
 //      (sticks_per_packet * num_forwarders).
 //   3. measured DRAM/compute knee (arch-specific; Blackhole = 48).
-// Read inside the single-source-of-truth sizing path so the op + create_stats_buffer
-// agree on num_workers / buffer geometry. `rows_pinned`: num_tile_rows is a row capacity
-// that one program serves for every smaller row count, so the row-dependent knee is skipped.
+// Called from the sizing path shared by the op and create_stats_buffer. `rows_pinned`: num_tile_rows is a
+// row capacity that one program serves for every smaller row count, so the row-dependent knee is skipped.
 uint32_t derive_worker_cap(
     const CoreCoord& grid_size,
     uint32_t num_links,

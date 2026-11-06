@@ -14,8 +14,9 @@
 
 namespace ttnn::experimental::prim {
 
-// Common runtime-arg slot of the live tile-row count in each kernel (kernels read the same slots).
-constexpr uint32_t kReaderRowsSlot = 6;        // after the six buffer addresses, before the optional map address
+// Common runtime-arg slot of the live tile-row count in each kernel (kernels read the same slots). The reader's
+// word sits before the optional affine-map address so its slot is the same with and without AFFINE_TILE_ROW_MAP.
+constexpr uint32_t kReaderRowsSlot = 6;        // after the six buffer addresses
 constexpr uint32_t kDrainWriterRowsSlot = 2;   // after output, trans_mat
 constexpr uint32_t kWorkerWriterRowsSlot = 3;  // after output, trans_mat, stats scratch
 constexpr uint32_t kComputeRowsSlot = 0;
