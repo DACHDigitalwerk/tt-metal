@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <bit>
+#include <mutex>
+#include <set>
+#include <string>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -584,7 +587,35 @@ std::optional<reshape_codegen::LaunchPlan> routed_codegen_plan(
         return std::nullopt;
     }
     const uint32_t num_cores = reshape_codegen::reshape_core_grid(tensor, sub_core_grid).num_cores();
-    if (reshape_codegen::is_demoted(tensor, logical_shape, mem_config, num_cores, *planned)) {
+    const bool demoted = reshape_codegen::is_demoted(tensor, logical_shape, mem_config, num_cores, *planned);
+    {
+        static std::mutex seen_mutex;
+        static std::set<std::string> seen;
+        const char* route = tensor.layout() != Layout::TILE                         ? "rm"
+                            : planned->tile_route == reshape_codegen::TileRoute::Lcm ? "lcm"
+                            : planned->tile_route == reshape_codegen::TileRoute::TileRows ? "tile_rows"
+                                                                                           : "tile_mapped";
+        auto key = fmt::format(
+            "RESHAPE_PROBE route={} demoted={} in={} out={} dtype={} layout={} in_buf={} out_buf={} in_mem={} "
+            "out_mem={} cores={} sub_grid={}",
+            route,
+            demoted,
+            tensor.logical_shape(),
+            logical_shape,
+            tensor.dtype(),
+            tensor.layout(),
+            tensor.memory_config().buffer_type(),
+            mem_config.buffer_type(),
+            tensor.memory_config().memory_layout(),
+            mem_config.memory_layout(),
+            num_cores,
+            sub_core_grid.has_value());
+        std::lock_guard lock(seen_mutex);
+        if (seen.insert(key).second) {
+            log_warning(tt::LogOp, "{}", key);
+        }
+    }
+    if (demoted) {
         return std::nullopt;
     }
     return planned;
