@@ -120,8 +120,6 @@ uint32_t derive_worker_cap(
     // WH's grid-derived budget (64) is already its optimum, so no BH-style knee there.
     // Tuned to the DiT (Wan/LTX/FLUX) shape suite; 48 is the conservative fallback.
     // The WAN_RMSNORM_WORKER_CAP override bypasses this knee so it can sweep BH freely.
-    // A pinned row capacity (MiniMax-H3: 74..470 tile rows, nearly all below the knee)
-    // takes the round-bound cap for the whole envelope.
     if (arch == tt::ARCH::BLACKHOLE && worker_cap_env == nullptr) {
         constexpr uint32_t kBhContentionKnee = 48u;
         constexpr uint32_t kBhRoundBoundCap = 64u;
