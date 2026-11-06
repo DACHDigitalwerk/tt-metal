@@ -22,8 +22,10 @@ for len in $LENGTHS; do
         run --attention-backend sol_attn --attention-backend-config "{\"tau\": $tau}"
         run --attention-backend sol_attn --attention-backend-config "{\"tau\": $tau}" --lofi --kv-dtype bf8
     done
-    # text / prefix query rows dense, as Sol's MMDiT integration and VSA do
-    run --attention-backend sol_attn --attention-backend-config '{"tau": 1.0, "dense_prefix_queries": true}'
+    # text / prefix rows and keys dense, as Sol's MMDiT integration and VSA do (the pre-pass takes the prefix length
+    # from sink_tokens; "text_len" resolves to the inputs' text length, else the non-video prefix)
+    run --attention-backend sol_attn \
+        --attention-backend-config '{"tau": 1.0, "sink_tokens": "text_len", "dense_prefix_queries": true}'
     for sparsity in 0.9 0.8; do
         run --attention-backend video_sparse_attn --attention-backend-config "{\"VSA_sparsity\": $sparsity}"
     done

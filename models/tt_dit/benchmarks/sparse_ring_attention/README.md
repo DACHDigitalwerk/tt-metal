@@ -200,7 +200,7 @@ power limits differ between systems.
 |---|---|---|
 | `fa` | dense baseline | bf16 |
 | `sol_attn` | `tau` 1.0, 1.5, 2.0 (higher keeps fewer blocks) | bf16, and LoFi with bf8 K/V |
-| `sol_attn` | `tau` 1.0 with `dense_prefix_queries` (prefix rows dense, as VSA) | bf16 |
+| `sol_attn` | `tau` 1.0 with `dense_prefix_queries` and `sink_tokens` = the prefix (prefix rows and keys dense, as VSA) | bf16 |
 | `video_sparse_attn` | `VSA_sparsity` 0.9 (base H3) and 0.8 (distilled) | bf16; 0.9 also LoFi with bf8 K/V |
 
 ```bash
