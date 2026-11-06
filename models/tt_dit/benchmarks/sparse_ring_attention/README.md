@@ -190,3 +190,24 @@ syn_5s... sol_attn: <ms> ms (p10 <ms>, p90 <ms>), kept 0.xxx, rel L2 0.0xxx, pcc
 of the same platform. Each record takes up to a few minutes at 15 s, mostly for the host fp64 reference;
 `--ref-heads` / `--ref-shards` shrink the slice. Compare timings only from the same machine and run: Galaxy
 power limits differ between systems.
+
+### Full matrix
+
+`run_matrix.sh` runs every case worth comparing, at 5, 10 and 15 s (11 runs per length, appended to
+`results_tt.jsonl`, then one table):
+
+| Backend | Settings | dtypes |
+|---|---|---|
+| `fa` | dense baseline | bf16 |
+| `sol_attn` | `tau` 1.0, 1.5, 2.0 (higher keeps fewer blocks) | bf16, and LoFi with bf8 K/V |
+| `sol_attn` | `tau` 1.0 with `dense_prefix_queries` (prefix rows dense, as VSA) | bf16 |
+| `video_sparse_attn` | `VSA_sparsity` 0.9 (base H3) and 0.8 (distilled) | bf16; 0.9 also LoFi with bf8 K/V |
+
+```bash
+./$B/run_matrix.sh                       # all lengths, synthetic inputs (about an hour; 15 s dominates)
+LENGTHS=5 ./$B/run_matrix.sh             # one length
+INPUTS=/data/h3_qkv ./$B/run_matrix.sh   # captured tensors
+```
+
+On synthetic inputs Sol's kept fraction at a given `tau` does not reflect real activations, so the `tau` sweep there
+gives time against kept fraction; accuracy needs captured inputs.
