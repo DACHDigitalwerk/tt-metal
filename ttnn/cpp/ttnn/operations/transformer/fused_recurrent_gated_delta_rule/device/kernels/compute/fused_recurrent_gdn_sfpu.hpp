@@ -36,6 +36,7 @@
 #include "api/compute/common_globals.h"
 #include "api/compute/eltwise_binary_sfpu.h"
 #include "api/compute/eltwise_unary/exp.h"
+#include "api/compute/eltwise_unary/rsqrt.h"
 #include "api/compute/sfpu_binary_bcast.h"
 #ifdef TRISC_MATH
 #include "llk_math_eltwise_sfpu_common.h"
@@ -190,6 +191,89 @@ inline void build_ebc16_body(uint32_t slot_e, uint32_t slot_b, uint32_t slot_c, 
     }
 }
 
+// The same with a fourth source: band 3 (rows 12..15) <- rows 0..3 of column 0 of DEST[slot_n] (ncol16: the norm
+// scalars ik, 0, s_q, 0). All four sources are read before anything is written.
+inline void build_ebcn16_body(uint32_t slot_e, uint32_t slot_b, uint32_t slot_c, uint32_t slot_n, uint32_t slot_out) {
+    const sfpi::vFloat e0 = keep_col0(sfpi::dst_reg[slot_e * kSlotVecs]);
+    const sfpi::vFloat b0 = keep_col0(sfpi::dst_reg[slot_b * kSlotVecs]);
+    const sfpi::vFloat c0 = keep_col0(sfpi::dst_reg[slot_c * kSlotVecs]);
+    const sfpi::vFloat n0 = keep_col0(sfpi::dst_reg[slot_n * kSlotVecs]);
+    const uint32_t ob = slot_out * kSlotVecs;
+    sfpi::dst_reg[ob + 0] = e0;    // rows 0..3, column 0 = e
+    sfpi::dst_reg[ob + 2] = b0;    // rows 4..7, column 0 = beta
+    sfpi::dst_reg[ob + 4] = c0;    // rows 8..11, column 0 = c
+    sfpi::dst_reg[ob + 6] = n0;    // rows 12..15, column 0 = ik, 0, s_q, 0
+    sfpi::dst_reg[ob + 1] = 0.0f;  // odd columns
+    sfpi::dst_reg[ob + 3] = 0.0f;
+    sfpi::dst_reg[ob + 5] = 0.0f;
+    sfpi::dst_reg[ob + 7] = 0.0f;
+#pragma GCC unroll 8
+    for (uint32_t v = kFaceVecs; v < 2 * kFaceVecs; v++) {  // face 1: columns 16..31
+        sfpi::dst_reg[ob + v] = 0.0f;
+    }
+}
+// acc's rows 0..3 (the vectors of kBand0Vecs) <- (first ? 0 : acc) + x * x over slot src's rows 0..3: the squares of
+// a row tile's live rows (row 0 = k, row 2 = q), fp32 products of exact copies, summed over the K tiles.
+inline void square_acc_rows4_body(uint32_t acc, uint32_t src, bool first) {
+    const uint32_t ab = acc * kSlotVecs, sb = src * kSlotVecs;
+#pragma GCC unroll 4
+    for (uint32_t i = 0; i < 4; i++) {
+        const sfpi::vFloat x = sfpi::dst_reg[sb + kBand0Vecs[i]];
+        if (first) {
+            sfpi::dst_reg[ab + kBand0Vecs[i]] = x * x;
+        } else {
+            const sfpi::vFloat a = sfpi::dst_reg[ab + kBand0Vecs[i]];
+            sfpi::dst_reg[ab + kBand0Vecs[i]] = a + x * x;
+        }
+    }
+}
+// Every lane of each 8-lane subvector <- the subvector's sum (rotate by 1, 2, 4 and add).
+inline sfpi::vFloat subvec_sum(sfpi::vFloat v) {
+    v = v + sfpi::subvec_shflror1(v);
+    sfpi::vFloat t = sfpi::subvec_shflror1(v);
+    t = sfpi::subvec_shflror1(t);
+    v = v + t;
+    t = sfpi::subvec_shflror1(v);
+    t = sfpi::subvec_shflror1(t);
+    t = sfpi::subvec_shflror1(t);
+    t = sfpi::subvec_shflror1(t);
+    return v + t;
+}
+// The norm tile N in slot out, a 16x32 tile: column 0 row 0 = ik = 1 / sqrt(k.k + eps), row 2 = s_q = scale / sqrt(q.q
+// + eps), everything else of faces 0 and 1 zero. k.k and q.q come from the squares accumulated in slot acc's rows 0..3
+// (row 0 = k, row 2 = q): the four band-0 vectors (faces 0 and 1, both column parities) summed lane-wise, then each
+// row's 8 lanes summed, so lane 0 of a row's subvector holds the row's sum (fp32 throughout). The rsqrt is the
+// LLK's exact-mode body (rsqrt_tile_init programs its constants). Without Norm: row 0 = 1, row 2 = scale.
+template <bool Norm>
+inline void norm_scalars_body(uint32_t acc, uint32_t out, uint32_t scale_bits, uint32_t eps_bits) {
+    const sfpi::vFloat scale = __builtin_bit_cast(float, scale_bits);
+    sfpi::vFloat v;
+    if constexpr (Norm) {
+        const uint32_t ab = acc * kSlotVecs;
+        const sfpi::vFloat a0 = sfpi::dst_reg[ab + kBand0Vecs[0]];
+        const sfpi::vFloat a1 = sfpi::dst_reg[ab + kBand0Vecs[1]];
+        const sfpi::vFloat a2 = sfpi::dst_reg[ab + kBand0Vecs[2]];
+        const sfpi::vFloat a3 = sfpi::dst_reg[ab + kBand0Vecs[3]];
+        v = (a0 + a1) + (a2 + a3);
+        v = subvec_sum(v);
+        const sfpi::vFloat eps = __builtin_bit_cast(float, eps_bits);
+        v = ckernel::sfpu::_calculate_sqrt_body_<false, true, false>(v + eps);
+    } else {
+        v = 1.0f;
+    }
+    // Lane l holds row l / 8, column 2 * (l % 8); vConstTileId = 2 * l. Row 2 (lanes 16..23) takes the scale; only
+    // the column-0 lanes of rows 0 and 2 (tile ids 0 and 32) survive.
+    v_if(sfpi::vConstTileId >= 32 && sfpi::vConstTileId < 48) { v = v * scale; }
+    v_endif;
+    v_if((sfpi::vConstTileId & static_cast<int>(0xE | 16)) != 0) { v = 0.0f; }
+    v_endif;
+    const uint32_t ob = out * kSlotVecs;
+    sfpi::dst_reg[ob + 0] = v;
+#pragma GCC unroll 15
+    for (uint32_t i = 1; i < 2 * kFaceVecs; i++) {
+        sfpi::dst_reg[ob + i] = 0.0f;
+    }
+}
 inline sfpi::vFloat or_bits(sfpi::vFloat a, sfpi::vFloat b) {
     return sfpi::as<sfpi::vFloat>(sfpi::as<sfpi::vUInt>(a) | sfpi::as<sfpi::vUInt>(b));
 }
@@ -342,6 +426,28 @@ inline void build_ebc16(uint32_t slot_e, uint32_t slot_b, uint32_t slot_c, uint3
 }
 inline void build_ebc16(uint32_t slot_e, uint32_t slot_b, uint32_t slot_c) {
     build_ebc16(slot_e, slot_b, slot_c, slot_e);
+}
+// build_ebc16 with a fourth band: column 0 rows 12..15 <- rows 0..3 of column 0 of DEST[slot_n] (the norm tile
+// ncol16: ik, 0, s_q, 0). Consumer: mul_col_bcast_band0(dst, ebc, 3) scales row 0 of dst by ik and row 2 by s_q.
+inline void build_ebcn16(uint32_t slot_e, uint32_t slot_b, uint32_t slot_c, uint32_t slot_n, uint32_t slot_out) {
+    MATH((detail::run([&] { detail::build_ebcn16_body(slot_e, slot_b, slot_c, slot_n, slot_out); })));
+}
+// The in-kernel norm, two calls per token in the constants pass:
+//   square_acc_rows4(acc, src, first): rows 0..3 of acc <- (first ? 0 : acc) + src * src (src: an exact copy of a
+//     qk16 tile, row 0 = k, row 2 = q), once per K tile;
+//   norm_scalars<Norm>(acc, out, scale_bits): the norm tile N in slot out (16x32: column 0 row 0 = 1/|k|, row 2 =
+//     scale/|q|, else 0) from the accumulated squares, eps = 1e-6 inside the root as the golden's l2_norm; without
+//     Norm, 1 and scale. Programs the SFPU's sqrt constants (LREG12, 13); park a scalar with load_scalar after it.
+inline void square_acc_rows4(uint32_t acc, uint32_t src, bool first) {
+    MATH((detail::run([&] { detail::square_acc_rows4_body(acc, src, first); })));
+}
+template <bool Norm>
+inline void norm_scalars(uint32_t acc, uint32_t out, uint32_t scale_bits) {
+    constexpr uint32_t kEps = 0x358637BDu;  // 1e-6f
+    if constexpr (Norm) {
+        ckernel::rsqrt_tile_init();
+    }
+    MATH((detail::run([&] { detail::norm_scalars_body<Norm>(acc, out, scale_bits, kEps); })));
 }
 
 // Scalar-times-tile without a resident DEST slot (pass 2's decay, four S tiles per acquire). Two calls:
